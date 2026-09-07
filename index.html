@@ -8,7 +8,7 @@
 
 @media(min-width:701px){.sidebar{overflow-y:auto;display:flex;flex-direction:column}.sidebar-foot{position:static;margin-top:auto;padding-top:24px}}
 </style></head><body>
-<div class="app-shell"><aside class="sidebar"><a class="brand" href="#song-of-the-wind"><span class="brand-icon">♪</span><span>大提琴练习册<small>第一册 · 第一把位</small></span></a><nav id="library" aria-label="练习目录"></nav><div class="sidebar-foot">配合纸质教材与老师的课程<br><span>第一阶段 · 0.3</span></div></aside>
+<div class="app-shell"><aside class="sidebar"><a class="brand" href="#song-of-the-wind"><span class="brand-icon">♪</span><span>大提琴练习册<small>第一册 · 拓展曲目</small></span></a><nav id="library" aria-label="练习目录"></nav><div class="sidebar-foot">配合纸质教材与老师的课程<br><span>第一阶段 · 0.4</span></div></aside>
 <main><header class="lesson-header"><div><div class="eyebrow" id="lessonKind"></div><h1 id="title"></h1><p id="description"></p></div><div class="header-actions"><button id="print">打印 / PDF</button></div></header>
 <div class="chips" id="chips"></div>
 <section class="player card" aria-label="播放控制"><div class="control-row"><button id="play" class="primary">▶ 播放</button><button id="stop">停止</button><label>速度 <select id="tempo" aria-label="速度"></select><span class="unit">拍/分钟</span></label><span class="separator"></span><label>小节 <select id="from" aria-label="起始小节"></select> 至 <select id="to" aria-label="结束小节"></select></label><button id="whole">全曲</button></div><div class="control-row secondary"><label><input type="checkbox" id="countIn" checked>预备拍</label><label><input type="checkbox" id="metronome">节拍声</label><label><input type="checkbox" id="loop">循环所选小节</label><label id="repeatLabel"><input type="checkbox" id="repeat" checked>按谱反复（仅全曲）</label></div><p id="playerStatus" role="status" aria-live="polite">先读谱、拍节奏，再播放核对。</p><div class="progress-track"><div id="progress"></div></div></section>
@@ -16,7 +16,7 @@
 <section id="scorePanel" role="tabpanel"><div class="score-toolbar"><div class="toggles"><span>辅助提示</span><label><input type="checkbox" data-layer="names">音名</label><label><input type="checkbox" data-layer="strings">弦名</label><label><input type="checkbox" data-layer="fingers">指法</label><label><input type="checkbox" data-layer="jianpu">简谱</label><label><input type="checkbox" data-layer="bows" checked>教材弓法</label></div><div><button id="answers">显示辅助</button><button id="hideAnswers">独立读谱</button></div></div><div id="phrases" class="phrases"></div><div class="card score-card"><div class="score-heading"><strong id="scoreHeading"></strong><span>点击音符听单音</span></div><div id="score"></div></div><div class="practice-notes card"><h2>这次练什么</h2><ul id="tips"></ul><p class="muted">播放为合成参考音，用于核对音高与时值。练琴时可以关闭网页节拍声，继续使用机械节拍器。</p></div><p class="source" id="source"></p></section>
 <section id="theoryPanel" role="tabpanel" hidden><div id="theory"></div><div class="card"><h2>三种数字，先分清楚</h2><p>指法 0 是空弦，1–4 是左手手指；简谱 0 是休止，1–7 是音级；音名 D3 中的 3 表示八度（中央 C 为 C4）。</p></div></section>
 <section id="recordsPanel" role="tabpanel" hidden><div class="card"><h2>记下一件值得下次注意的事</h2><p class="muted">记录只保存在当前浏览器。换到另一台电脑时，导出备份，再导入；不会自动上传。</p><form id="recordForm"><div class="control-row"><label>日期 <input id="recordDate" type="date" required></label><label>练习速度 <input id="recordTempo" type="number" min="20" max="160" value="60" required></label><label>状态 <select id="recordStatus"><option>练习中</option><option>较稳定</option><option>需要复习</option></select></label></div><label class="note-label" for="recordNote">易错小节 / 老师提醒 / 下次目标</label><textarea id="recordNote" maxlength="5000" rows="3" placeholder="例如：第 3 小节先读 B–G–D–B，换弦前不要急。"></textarea><button class="primary" type="submit">保存本次记录</button></form><p id="recordMessage" role="status"></p></div><div class="backup-row"><button id="exportRecords">导出全部记录</button><label class="button" for="importRecords">导入记录备份</label><input id="importRecords" type="file" accept=".json,application/json" hidden><span>重复记录跳过，冲突保留两份。</span></div><div id="records"></div></section>
-<footer>低音谱号 · 第一把位 · 按自己的节奏练习</footer>
+<footer>低音谱号 · 按自己的节奏练习</footer>
 </main></div><div id="printRoot"></div><script>(function(root){
 'use strict';
 // Transcribed from the three score images supplied by the user.
@@ -84,6 +84,96 @@ const api={sourceBars,lesson};if(typeof module!=='undefined'&&module.exports)mod
 })(globalThis);
 </script><script>(function(root){
 'use strict';
+// User-provided 73-bar bass-clef score. Bar numbers are the printed numbers.
+// t = quarter-note triplet (2/3 beat); s/c/e = tie start/continue/stop.
+const source=[
+'F#4:t F#4:t E4:t F#4:t F#4:t E4:t',
+'-:4','-:4','-:4','-:4','-:4','-:4',
+'-:2 -:1 E3:.5 F#3:.5',
+'G3:1.5 F#3:.5 G3:1 B3:1',
+'F#3:2 -:1 B2:1',
+'E3:1.5 D3:.5 E3:1 G3:1',
+'D3:2 -:1 B2:.5 B2:.5',
+'C3:1.5 B2:.5 C3:.5 G3:1.5',
+'B2:2 -:.5 G3:.5 G3:.5 G3:.5',
+'F#3:1.5 C#3:.5 C#3:1 F#3:1',
+'F#3:2 -:1 E3:.5 F#3:.5',
+'G3:1.5 F#3:.5 G3:1 B3:1',
+'F#3:2 -:1 B2:.5 B2:.5',
+'E3:1.5 D3:.5 E3:1 G3:1',
+'D3:2 -:1 -:.5 B2:.5',
+'C3:1 G3:.5 F#3:.5:s F#3:1:e G3:1',
+'A3:.5 A3:1 B3:.5 G3:2',
+'G3:.5 F#3:.5 E3:.5 E3:.5 F#3:1 D#3:1',
+'E3:2 -:1 G3:.5 A3:.5',
+'B3:1.5 A3:.5 B3:1 D4:1',
+'A3:2 -:1 D3:.5 D3:.5',
+'G3:1.5 F#3:.5 G3:1 B3:1',
+'B3:4',
+'E3:.5 F#3:.5 G3:1 F#3:.5 G3:.5 A3:.5 A3:.5',
+'G3:1.5 D3:.5:s D3:2:e',
+'C4:1 B3:1 A3:1 G3:1',
+'B3:4:s',
+'B3:2:e -:1 B3:1',
+'E4:2 D4:1.5:s D4:.5:e',
+'B3:.5 A3:.5 G3:2 -:.5 G3:.5',
+'A3:1 G3:.5 A3:.5:s A3:.5:e D4:1.5',
+'B3:2 -:1 B3:1',
+'E4:2 D4:2',
+'B3:.5 A3:.5 G3:2 -:.5 G3:.5',
+'A3:1 G3:.5 A3:.5:s A3:1:e E3:1',
+'E3:2 -:1 E3:.5 F#3:.5',
+'G3:1.5 F#3:.5 G3:1 B3:1',
+'F#3:2 -:1 B2:1',
+'E3:1.5 D3:.5 E3:1 G3:1',
+'D3:2 -:1 B2:.5 B2:.5',
+'C3:1.5 B2:.5 C3:.5 G3:1.5',
+'B2:2 -:.5 G3:.5 G3:.5 G3:.5',
+'F#3:1.5 C#3:.5 C#3:1 F#3:1',
+'F#3:2 -:1 E3:.5 F#3:.5',
+'G3:1.5 F#3:.5 G3:1 B3:1',
+'F#3:2 -:1 B2:.5 B2:.5',
+'E3:1.5 D3:.5 E3:1 G3:1',
+'D3:2 -:1 -:.5 B2:.5',
+'C3:1 G3:.5 F#3:.5:s F#3:1:e G3:1',
+'A3:1 B3:.5 G3:.5:s G3:2:e',
+'G3:.5 F#3:.5 E3:.5 E3:.5 F#3:1 D#3:1',
+'E3:3 E3:.25 F#3:.25 G3:.25 A3:.25',
+'B3:4',
+'B3:t D4:t C4:t B3:t A3:t G3:t',
+'D3:4:s',
+'D3:2:e -:1 E3:.25 F#3:.25 G3:.25 A3:.25',
+'B3:4',
+'B3:t D4:t C4:t B3:t A3:t G3:t',
+'A3:4:s',
+'A3:2:e -:1 B3:1',
+'E3:3 E3:.5 F3:.5:s',
+'F3:3:e F3:.5 G3:.5:s',
+'G3:3:e G3:.5 A3:.5:s',
+'A3:4:c','A3:4:e','A3:4:s','A3:4:e',
+'A3:1 -:1 -:2'
+];
+// Fingering is an editorial reference, not printed in the uploaded score.
+const fingers={B2:['G',3],C3:['G',4],'C#3':['G',4,'I','forward'],D3:['D',0],'D#3':['D',1,'I','back'],E3:['D',1],F3:['D',2],'F#3':['D',3],G3:['D',4],A3:['A',0],B3:['A',1],C4:['A',2],D4:['A',4],E4:['A',3,'IV'],'F#4':['A',4,'IV','forward']};
+const bars=source.map(b=>b.split(' ').map((token,n)=>{const [pitch,d,tie]=token.split(':'),e={pitch:pitch==='-'?null:pitch,beats:d==='t'?2/3:Number(d)};if(d==='t')Object.assign(e,{writtenBeats:1,tuplet:{actual:3,normal:2,group:Math.floor(n/3),index:n%3}});if(tie)e.tie={s:'start',c:'continue',e:'stop'}[tie];if(e.pitch){const [string,finger,position='I',extension]=fingers[e.pitch];Object.assign(e,{string,finger,position});if(extension)e.extension=extension;}else if(e.beats===4)e.measureRest=true;return e;}));
+// Slur endpoints use one-based bar numbers and zero-based note indices.
+const slurs=[];const slur=(bar,a,z)=>slurs.push({from:[bar,a],to:[bar,z]});
+[9,11,13,15,17,19,25,27,31,42,44,46,48,50,52].forEach(b=>{slur(b,0,1);slur(b,2,3);});
+[8,16,24,41,49].forEach(b=>slur(b,2,3));
+[21,54].forEach(b=>slur(b,1,3));slur(22,1,2);
+[23,56].forEach(b=>{slur(b,0,1);slur(b,4,5);});
+slur(29,0,2);slur(29,3,4);slur(30,0,1);
+[35,39].forEach(b=>slur(b,0,2));slur(40,0,1);slur(55,0,2);
+slur(57,1,4);slur(61,2,5);[59,63].forEach(b=>slur(b,4,5));
+[66,67,68].forEach(b=>slur(b,1,2));
+slurs.filter(s=>[13,46].includes(s.from[0])&&s.from[1]===0).forEach(s=>s.placement='below');
+const bows=[[8,2,'up'],[10,2,'up'],[12,2,'down'],[14,2,'up'],[16,2,'up'],[18,2,'down'],[20,3,'up'],[24,2,'up'],[26,2,'up'],[33,2,'up'],[34,0,'down'],[34,1,'up'],[37,2,'up'],[39,4,'up'],[41,2,'up'],[43,2,'up'],[45,2,'down'],[47,2,'up'],[49,2,'up'],[51,2,'down'],[53,3,'up'],[57,1,'up'],[61,2,'up'],[65,2,'up']];
+bows.forEach(([b,n,bow])=>bars[b-1][n].bow=bow);
+const lesson={id:'castle-in-the-sky-advanced',title:'天空之城进阶版',english:'君をのせて · Carrying You',composer:'Joe Hisaishi',kind:'曲目',collection:'拓展曲目',meter:[4,4],key:'E',mode:'minor',keyLabel:'E 小调',fifths:1,jianpuTonic:'G3',jianpuKey:'G',jianpuFifths:1,tempo:60,sourceTempo:116,tempoLabel:'练习速度（原谱 ♩ = 116）',repeat:true,repeatLabel:'第 34 小节起反复 · 一二房',repeatPlan:{start:34,firstEnding:57,repeatEnd:65,secondEnding:66},divisions:24,systemBars:2,minNoteSpacing:32,topPadding:48,printSystems:3,stringsLabel:'G、D、A 弦',positionLabel:'含第四把位与伸张 · 参考指法',fingeringNote:'指法为编辑参考，I / IV 表示第一 / 第四把位；换把与弓法请跟老师确认。',description:'原调进阶谱 · 73 小节 · 三连音、连弓、一二房反复与换把',source:'按你上传的《君をのせて》低音谱号单页谱转录，保留原调、原音区与 73 小节结构。原图无数字指法；辅助指法为编辑参考。',focus:'三连音、延音与连弓、反复路线及换把',bars,slurs,sections:[{label:'前奏与休止',from:1,to:7},{label:'主题起句',from:8,to:19},{label:'主题展开',from:20,to:33},{label:'反复段起点',from:34,to:40},{label:'主题再现',from:41,to:56},{label:'第一房',from:57,to:65},{label:'第二房与结尾',from:66,to:73}],theory:[{title:'三连音：三个音占两拍',body:'第 1、59、63 小节的四分音符三连音，每组三个音均分两拍；一小节两组，共四拍。播放按真实时值计算，节拍器仍每四分音符一拍。',task:'先以 30 BPM 听第 59 小节，感受两拍中的三个均匀发音。'},{title:'一二房怎样走',body:'完整播放路线：第 1–65 小节；回到第 34 小节，演奏到第 56 小节；跳过第一房，接第 66–73 小节。勾选“按谱反复”时才走此路线；分段播放始终按所选范围直走。',task:'在第 34、57、65、66 小节找到反复与房子记号。'},{title:'连弓与延音不同',body:'不同音高之间的弧线是连弓，仍有不同音符；相同音高间的延音线则合并时值，中间不重新发音。网页保留连线，延音只发声一次。',task:'对比第 21 小节外层连弓与内层 F♯ 延音线。'},{title:'参考指法与高把位',body:'辅助行中的 I / IV 表示第一 / 第四把位。E4 参考 A 弦第四把位 3 指，F♯4 参考该把位 4 指前伸；C♯3 使用 G 弦 4 指前伸，D♯3 使用 D 弦低 1 指。它不是全程第一把位练习，原图也没有指定数字指法。',task:'先让老师确认第 1、15、23、34、38 小节的换把和伸张，再练习。'},{title:'E 小调与临时记号',body:'调号为 F♯，曲中还出现 C♯、D♯和 F 自然音。简谱辅助采用 1=G，E 为 6；音名、弦名、指法可分开显示。',task:'核对第 66–67 小节的还原 F，并听跨小节延音。'}],practiceTips:['保留原谱第 1 小节高音三连音和第 2–7 小节整小节休止；可直接选“主题起句”从第 8 小节开始。','默认 60 BPM，提供 20、30 与原谱 116 BPM 档位；先分段读谱，再跟老师练习高把位。','弓向与连线按上传谱录入；辅助指法是参考方案，老师可以根据乐句调整。','打印同时包含练习版与辅助版；简谱默认隐藏，不进入打印谱。']};
+const api={lesson};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.CelloAdvanced=api;
+})(globalThis);
+</script><script>(function(root){
+'use strict';
 const fingering={D3:{string:'D',finger:0},E3:{string:'D',finger:1},'F#3':{string:'D',finger:3},G3:{string:'D',finger:4},A3:{string:'A',finger:0},B3:{string:'A',finger:1},'C#4':{string:'A',finger:3},D4:{string:'A',finger:4}};
 const note=(pitch,beats,extra={})=>({pitch,beats,...(pitch?fingering[pitch]:{}),...extra});
 const eighths=s=>s.split(' ').map(p=>note(p,.5));
@@ -136,6 +226,7 @@ children.theory=[{title:'弱起不是漏拍',body:'开头 A 是半拍弱起，�
 lessons.splice(1,0,twinkle,...variations,children,rhody,row);
 lessons.forEach(l=>{if(!l.sections.length)l.sections=Array.from({length:Math.ceil((l.bars.length-(l.pickup?1:0))/4)},(_,i)=>({label:'乐句 '+(i+1),from:i*4+1+(l.pickup?1:0),to:Math.min(l.bars.length,(i+1)*4+(l.pickup?1:0))}));});
 lessons.push((typeof module!=='undefined'&&module.exports?require('./laputa.js'):root.CelloLaputa).lesson);
+lessons.push((typeof module!=='undefined'&&module.exports?require('./advanced.js'):root.CelloAdvanced).lesson);
 const library={version:3,lessons,planned:[]};
 if(typeof module!=='undefined'&&module.exports)module.exports=library;else root.CelloLibrary=library;
 })(globalThis);
@@ -148,7 +239,10 @@ function barBeats(l,i){return l.bars[i].reduce((sum,e)=>sum+e.beats,0);}
 function validateLesson(l){
  if(!l||!Array.isArray(l.bars)||l.meter[1]!==4)throw Error('不支持的练习结构');
  if(l.pickup!==undefined&&!(l.pickup>0&&l.pickup<l.meter[0]&&l.bars.length>1))throw Error('无效弱起');
- l.bars.forEach((bar,i)=>{const expected=l.pickup&&i===0?l.pickup:l.pickup&&i===l.bars.length-1?l.meter[0]-l.pickup:l.meter[0];if(!bar.length||Math.abs(barBeats(l,i)-expected)>1e-9)throw Error(`第 ${barLabel(l,i)} 小节拍数不符`);bar.forEach(e=>{if(![.125,.25,.375,.5,.75,1,1.5,2,3,4].includes(e.beats))throw Error('不支持的时值');if(e.pitch){pitchInfo(e.pitch);if(!['A','D','G','C'].includes(e.string)||![0,1,2,3,4].includes(e.finger))throw Error('缺少指法');}});});
+ l.bars.forEach((bar,i)=>{const expected=l.pickup&&i===0?l.pickup:l.pickup&&i===l.bars.length-1?l.meter[0]-l.pickup:l.meter[0];if(!bar.length||Math.abs(barBeats(l,i)-expected)>1e-9)throw Error(`第 ${barLabel(l,i)} 小节拍数不符`);bar.forEach(e=>{if(!(e.tuplet&&e.writtenBeats===1&&Math.abs(e.beats-2/3)<1e-9)&&![.125,.25,.375,.5,.75,1,1.5,2,3,4].includes(e.beats))throw Error('不支持的时值');if(e.pitch){pitchInfo(e.pitch);if(!['A','D','G','C'].includes(e.string)||![0,1,2,3,4].includes(e.finger))throw Error('缺少指法');}});});
+ l.bars.forEach(bar=>{bar.forEach((e,i)=>{if(!e.tuplet)return;const t=e.tuplet;if(t.actual!==3||t.normal!==2||![0,1,2].includes(t.index))throw Error('无效三连音');const group=bar.slice(i-t.index,i-t.index+3);if(group.length!==3||group.some((n,k)=>!n.tuplet||n.tuplet.index!==k||n.tuplet.group!==t.group||n.writtenBeats!==1||Math.abs(n.beats-2/3)>1e-9))throw Error('三连音组不完整');});});
+ if(l.repeatPlan){const r=l.repeatPlan;if(![r.start,r.firstEnding,r.repeatEnd,r.secondEnding].every(Number.isInteger)||r.start<1||r.start>=r.firstEnding||r.firstEnding>r.repeatEnd||r.secondEnding!==r.repeatEnd+1||r.secondEnding>l.bars.length)throw Error('无效反复路线');}
+ for(const a of l.slurs||[]){const [fb,fn]=a.from,[tb,tn]=a.to;if(!l.bars[fb-1]?.[fn]?.pitch||!l.bars[tb-1]?.[tn]?.pitch||fb>tb||(fb===tb&&fn>=tn))throw Error('无效连弓线');}
  const flat=l.bars.flat();flat.forEach((e,i)=>{if(e.tie&&!['start','continue','stop'].includes(e.tie))throw Error('无效延音线');if(['start','continue'].includes(e.tie)){const n=flat[i+1];if(!e.pitch||n?.pitch!==e.pitch||!['continue','stop'].includes(n.tie))throw Error('延音线必须连接相同音高');}if(['continue','stop'].includes(e.tie)&&(!['start','continue'].includes(flat[i-1]?.tie)||flat[i-1].pitch!==e.pitch))throw Error('延音线缺少起点');});return true;
 }
 function timeline(l,{from=1,to=l.bars.length,tempo=60,countIn=false,repeat=false}={}){
@@ -156,7 +250,8 @@ function timeline(l,{from=1,to=l.bars.length,tempo=60,countIn=false,repeat=false
  const beatSeconds=60/tempo,lead=countIn?(l.pickup&&from===1?l.meter[0]-l.pickup:l.meter[0]):0;let time=lead*beatSeconds;const entries=[],clicks=[];
  for(let b=0;b<lead;b++)clicks.push({time:b*beatSeconds,strong:b===0,pre:true,beat:b+1});
  const passes=repeat&&l.repeat&&from===1&&to===l.bars.length?2:1;
- for(let pass=0;pass<passes;pass++)for(let bar=from-1;bar<to;bar++){
+ const route=[];if(passes===2&&l.repeatPlan){const r=l.repeatPlan;for(let bar=0;bar<r.repeatEnd;bar++)route.push({bar,pass:0});for(let bar=r.start-1;bar<r.firstEnding-1;bar++)route.push({bar,pass:1});for(let bar=r.secondEnding-1;bar<to;bar++)route.push({bar,pass:1});}else for(let pass=0;pass<passes;pass++)for(let bar=from-1;bar<to;bar++)route.push({bar,pass});
+ for(const {bar,pass} of route){
   const duration=barBeats(l,bar),offset=l.pickup&&bar===0?l.meter[0]-l.pickup:0;
   for(let b=Math.ceil(offset);b<offset+duration;b++)clicks.push({time:time+(b-offset)*beatSeconds,strong:b===0,bar,beat:b+1,pass,pre:false});
   let elapsed=0;l.bars[bar].forEach((event,index)=>{entries.push({time:time+elapsed*beatSeconds,duration:event.beats*beatSeconds,bar,index,pass,...event});elapsed+=event.beats;});time+=duration*beatSeconds;
@@ -182,8 +277,9 @@ function keyAlter(l,step){const count=l.fifths||0;return count>0?('FCGDAEB'.slic
 function degree(l,pitch){if(!pitch)return {text:'0',octave:0};const p=C.pitchInfo(pitch),tonic=C.pitchInfo(l.jianpuTonic||'D3'),delta=p.diatonic-tonic.diatonic,alter=p.alter-keyAlter({fifths:l.jianpuFifths??l.fifths},p.step);return {text:(alter>0?'♯':alter<0?'♭':'')+((delta%7+7)%7+1),octave:Math.floor(delta/7)};}
 const tieCurve=(x,y,xx,yy)=>`<path class="tie" d="M ${x} ${y} C ${x+(xx-x)*.25} ${y-10}, ${x+(xx-x)*.75} ${yy-10}, ${xx} ${yy}" fill="none" stroke="currentColor" stroke-width="1.4"/>`;
 function renderSystem(l,start,count,layers={},selection=null,interactive=true,mobile=false){
- const rows=['names','strings','fingers','jianpu'].filter(r=>layers[r]);const width=mobile?700:1070,left=155,bw=(width-left-15)/(mobile?(l.systemBars?1:2):(l.systemBars||4)),height=rows.length?196+rows.length*25:layers.bows?185:155;
- let s=`<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(l.title)}，第 ${start+1} 至 ${start+count} 小节">`;
+ const rows=['names','strings','fingers','jianpu'].filter(r=>layers[r]);const width=mobile?700:1070,left=155,bw=(width-left-15)/(mobile?(l.systemBars?1:2):(l.systemBars||4)),height=(rows.length?196+rows.length*25:layers.bows?185:155)+(l.topPadding||0);
+ let s=`<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(l.title)}，第 ${start+1} 至 ${start+count} 小节"><g transform="translate(0,${l.topPadding||0})">`;
+ const positions=new Map();
  for(let i=0;i<count;i++){const bi=start+i;if(selection&&bi+1>=selection.from&&bi+1<=selection.to)s+=`<rect class="bar-selection" x="${left+i*bw}" y="43" width="${bw}" height="104" rx="5"/>`;}
  for(let y=72;y<=120;y+=12)s+=line(14,y,left+bw*count,y);
  s+=glyph('E062',22,84);if(l.fifths<=-1)s+=glyph('E260',65,108);if(l.fifths<=-2)s+=glyph('E260',84,90);if(l.fifths>=1)s+=glyph('E262',65,84);if(l.fifths>=2)s+=glyph('E262',84,102);
@@ -191,51 +287,63 @@ function renderSystem(l,start,count,layers={},selection=null,interactive=true,mo
  const rowNames={names:'音名',strings:'弦名',fingers:'指法',jianpu:'简谱 1='+(l.jianpuKey||'D')};rows.forEach((r,i)=>s+=text(rowNames[r],14,191+i*25,'annotation rowlabel'));
  if(start===0&&layers.bows&&l.dynamic)s+=text(l.dynamic,33,156,'annotation','font-style="italic" font-weight="bold"');
  for(let i=0;i<count;i++){
-  const bi=start+i,bar=l.bars[bi],bx=left+i*bw,scale=(bw-40)/l.meter[0];s+=text(C.barLabel(l,bi),bx+7,14,'bar-number');let beat=0;
+  const bi=start+i,bar=l.bars[bi],bx=left+i*bw,scale=(bw-40)/l.meter[0];s+=text(C.barLabel(l,bi),bx+7,l.topPadding?-30:14,'bar-number');let beat=0;
   const gap=l.minNoteSpacing||0,flex=(bw-40-gap*bar.length)/l.meter[0],accidentals=new Map();const points=bar.map((e,ni)=>{const p={x:bx+25+ni*gap+beat*(gap?flex:scale),y:e.pitch?C.pitchInfo(e.pitch).y:96,beat,event:e};beat+=e.beats;return p;});
-  const beams=new Map(),groups=[];for(let j=0;j<points.length;){const a=j,p=points[j];if(!p.event.pitch||p.event.beats>=1){j++;continue;}while(j+1<points.length&&points[j+1].event.pitch&&points[j+1].event.beats<1&&Math.floor(points[j+1].beat)===Math.floor(p.beat))j++;if(j>a){const y=Math.max(...points.slice(a,j+1).map(p=>p.y))+35;for(let k=a;k<=j;k++)beams.set(k,{y});groups.push({a,z:j,y});}j++;}
+  points.forEach((p,n)=>positions.set(`${bi+1}:${n}`,p));
+  const beams=new Map(),groups=[];for(let j=0;j<points.length;){const a=j,p=points[j];if(!p.event.pitch||(p.event.writtenBeats||p.event.beats)>=1){j++;continue;}while(j+1<points.length&&points[j+1].event.pitch&&(points[j+1].event.writtenBeats||points[j+1].event.beats)<1&&Math.floor(points[j+1].beat)===Math.floor(p.beat))j++;if(j>a){const y=Math.max(...points.slice(a,j+1).map(p=>p.y))+35;for(let k=a;k<=j;k++)beams.set(k,{y});groups.push({a,z:j,y});}j++;}
   points.forEach(({x,y,event:e},ni)=>{
-   const p=e.pitch?C.pitchInfo(e.pitch):null,id=`${l.id}:${bi}:${ni}`,label=p?`${p.name}，${e.beats} 拍，${e.string} 弦 ${e.finger} 指`:`休止 ${e.beats} 拍`;
+   const p=e.pitch?C.pitchInfo(e.pitch):null,id=`${l.id}:${bi}:${ni}`,label=p?`${p.name}，${e.tuplet?"⅔":e.beats} 拍，${e.string} 弦 ${e.finger} 指`:`休止 ${e.tuplet?"⅔":e.beats} 拍`;
    s+=`<g class="note-event" data-note="${id}" data-pitch="${esc(e.pitch||'')}" ${interactive?`tabindex="0" role="button" aria-label="${label}"`:''}><title>${label}</title><rect class="note-halo" x="${x-9}" y="44" width="34" height="105" rx="5"/>`;
-   const r=rhythm(e.beats);
-   if(p){const accidentalKey=p.step+p.octave,previous=accidentals.has(accidentalKey)?accidentals.get(accidentalKey):keyAlter(l,p.step);if(p.alter!==previous&&!['stop','continue'].includes(e.tie))s+=glyph(p.alter===1?'E262':p.alter===-1?'E260':'E261',x-23,y);accidentals.set(accidentalKey,p.alter);
+   const r=rhythm(e.writtenBeats||e.beats);
+   if(p){const accidentalKey=p.step+p.octave,previous=accidentals.has(accidentalKey)?accidentals.get(accidentalKey):keyAlter(l,p.step);if(p.alter!==previous&&!['stop','continue'].includes(e.tie))s+=glyph(p.alter===1?'E262':p.alter===-1?'E260':'E261',x-23,y);if(!['stop','continue'].includes(e.tie))accidentals.set(accidentalKey,p.alter);
     for(let ledger=60;ledger>=y;ledger-=12)s+=line(x-4,ledger,x+18,ledger);for(let ledger=132;ledger<=y;ledger+=12)s+=line(x-4,ledger,x+18,ledger);
     s+=glyph(r.base===4?'E0A2':r.base===2?'E0A3':'E0A4',x,y);const stem=beams.get(ni)?.y??y+35;if(r.base<4)s+=line(x+.7,y,x+.7,stem,1.4);if(r.flags&&!beams.has(ni))s+=glyph(({1:'E241',2:'E243',3:'E245'})[r.flags],x+.7,stem);
-   }else s+=glyph(({.125:'E4E8',.25:'E4E7',.5:'E4E6',1:'E4E5',2:'E4E4',4:'E4E3'})[r.base],x,96);
+   }else s+=glyph(({.125:'E4E8',.25:'E4E7',.5:'E4E6',1:'E4E5',2:'E4E4',4:'E4E3'})[r.base],e.measureRest?bx+bw/2:x,e.measureRest?84:96);
    if(r.dotted)s+=`<circle cx="${x+20}" cy="${p?y-6:90}" r="2" fill="currentColor"/>`;
-   if(layers.bows&&e.bow)s+=glyph(e.bow==='down'?'E610':'E612',x-1,42);
+   if(layers.bows&&e.bow)s+=glyph(e.bow==='down'?'E610':'E612',x-1,l.topPadding?Math.min(42,y-28):42);
    if(e.articulation==='staccato')s+=`<circle cx="${x+6}" cy="${Math.min(y-15,57)}" r="2" fill="currentColor"/>`;
    if(e.articulation==='tenuto')s+=line(x,Math.min(y-15,57),x+12,Math.min(y-15,57),1.5);
    if(layers.bows&&e.expression)s+=text(e.expression,x,155,'annotation','font-style="italic"');
    if(layers.bows&&e.breath)s+=glyph('E4CE',Math.min(x+36,bx+bw-12),55);
-   rows.forEach((row,ri)=>{const yy=191+ri*25,num=degree(l,e.pitch);let value=row==='names'?(p?p.name:'休止'):row==='strings'?(p?e.string:'—'):row==='fingers'?(p?(e.extension?(e.extension==='back'?'1低':'4伸'):e.finger):'—'):num.text+(e.beats===4?' — — —':e.beats===3?' — —':e.beats===2?' —':r.dotted?' ·':'');s+=text(value,x-3,yy,'annotation',l.systemBars?'style="font-size:12px"':'');if(row==='jianpu'){for(let k=0;k<r.flags;k++)s+=line(x-3,yy+3+k*3,x+10,yy+3+k*3);for(let k=0;k<Math.abs(num.octave);k++)s+=`<circle cx="${x+2}" cy="${num.octave>0?yy-17-k*5:yy+9+r.flags*3+k*5}" r="1.6" fill="currentColor"/>`;}});
+   rows.forEach((row,ri)=>{const yy=191+ri*25,num=degree(l,e.pitch);let value=row==='names'?(p?p.name:'休止'):row==='strings'?(p?e.string:'—'):row==='fingers'?(p?((e.extension?(e.extension==='back'?'1低':'4伸'):e.finger)+(e.position?'·'+e.position:'')):'—'):num.text+(e.beats===4?' — — —':e.beats===3?' — —':e.beats===2?' —':r.dotted?' ·':'');s+=text(value,x-3,yy,'annotation',l.systemBars?'style="font-size:12px"':'');if(row==='jianpu'){for(let k=0;k<r.flags;k++)s+=line(x-3,yy+3+k*3,x+10,yy+3+k*3);for(let k=0;k<Math.abs(num.octave);k++)s+=`<circle cx="${x+2}" cy="${num.octave>0?yy-17-k*5:yy+9+r.flags*3+k*5}" r="1.6" fill="currentColor"/>`;}});
    s+='</g>';
   });
   groups.forEach(({a,z,y})=>{s+=line(points[a].x+.7,y,points[z].x+.7,y,4);for(let level=2;level<=3;level++)for(let n=a;n<=z;n++)if(rhythm(points[n].event.beats).flags>=level){const next=n<z&&rhythm(points[n+1].event.beats).flags>=level,prev=n>a&&rhythm(points[n-1].event.beats).flags>=level,by=y-(level-1)*7;if(next)s+=line(points[n].x+.7,by,points[n+1].x+.7,by,3);else if(!prev)s+=line(points[n].x+.7,by,points[n].x+(n===z?-9:10),by,3);}});
   points.forEach((p,ni)=>{if(['start','continue'].includes(p.event.tie)){const next=points[ni+1]||(i+1<count?{x:bx+bw+25,y:C.pitchInfo(l.bars[bi+1][0].pitch).y}:null);s+=tieCurve(p.x+13,p.y-13,next?next.x-2:bx+bw-3,next?next.y-13:p.y-13);}if(i===0&&ni===0&&['stop','continue'].includes(p.event.tie))s+=tieCurve(left-5,p.y-13,p.x-2,p.y-13);});
   if(layers.bows){const held=points.find(p=>p.event.hold);if(held){s+=line(held.x,158,Math.max(held.x+14,points.at(-1).x+15),158);s+=text(held.event.hold,held.x,175,'annotation rowlabel');}}
-  const end=bx+bw,isEnd=bi===l.bars.length-1;
-  if(isEnd){s+=line(end-6,72,end-6,120);s+=line(end,72,end,120,3);if(l.repeat)s+=`<circle cx="${end-13}" cy="90" r="2.2" fill="currentColor"/><circle cx="${end-13}" cy="102" r="2.2" fill="currentColor"/>`;}
+  if(bar[0]?.tuplet){for(let j=0;j<bar.length;j+=3){const first=points[j],last=points[j+2],yy=Math.min(...points.slice(j,j+3).map(p=>p.y))-27,mid=(first.x+last.x+12)/2;s+=`<g class="tuplet">`+line(first.x,yy+5,first.x,yy)+line(first.x,yy,mid-9,yy)+line(mid+9,yy,last.x+12,yy)+line(last.x+12,yy,last.x+12,yy+5)+text('3',mid-4,yy+4,'annotation')+'</g>';}}
+  const end=bx+bw,isEnd=bi===l.bars.length-1,rp=l.repeatPlan;
+  if(rp&&bi+1===rp.start)s+=line(bx+1,72,bx+1,120,3)+line(bx+7,72,bx+7,120)+`<circle cx="${bx+14}" cy="90" r="2.2"/><circle cx="${bx+14}" cy="102" r="2.2"/>`;
+  if(rp&&bi+1===rp.repeatEnd)s+=line(end-6,72,end-6,120)+line(end,72,end,120,3)+`<circle cx="${end-13}" cy="90" r="2.2"/><circle cx="${end-13}" cy="102" r="2.2"/>`;
+  if(rp&&bi+1>=rp.firstEnding){const first=bi+1<=rp.repeatEnd,n=first?1:2,initial=bi+1===(first?rp.firstEnding:rp.secondEnding),last=bi+1===(first?rp.repeatEnd:l.bars.length);s+=`<g class="volta">`+line(bx,-12,end,-12);if(initial)s+=line(bx,-12,bx,0);if(initial||i===0)s+=text(n+'.',bx+7,4,'annotation');if(last)s+=line(end,-12,end,0);s+='</g>';}
+
+  if(isEnd){s+=line(end-6,72,end-6,120);s+=line(end,72,end,120,3);if(l.repeat&&!l.repeatPlan)s+=`<circle cx="${end-13}" cy="90" r="2.2" fill="currentColor"/><circle cx="${end-13}" cy="102" r="2.2" fill="currentColor"/>`;}
   else s+=line(end,72,end,120);
  }
- return s+'</svg>';
+ for(const slur of l.slurs||[]){const [fb,fn]=slur.from,[tb,tn]=slur.to;if(tb<start+1||fb>start+count)continue;const a=positions.get(`${fb}:${fn}`),z=positions.get(`${tb}:${tn}`),x=a?a.x+6:left,xx=z?z.x+6:left+bw*count,below=slur.placement==='below',y=(a||z).y+(below?44:-15),yy=(z||a).y+(below?44:-15),peak=below?Math.max(y,yy)+20:Math.min(y,yy)-24;s+=`<path class="slur" d="M ${x} ${y} C ${x+(xx-x)*.25} ${peak}, ${x+(xx-x)*.75} ${peak}, ${xx} ${yy}" fill="none" stroke="currentColor" stroke-width="1.2"/>`;}
+ return s+'</g></svg>';
 }
 function musicxml(l,answers=false,tempo=l.tempo){
- C.validateLesson(l);const bars=l.bars.map((bar,i)=>{
+ C.validateLesson(l);const divisions=l.divisions||8;const bars=l.bars.map((bar,i)=>{
   let inner=i%(l.systemBars||4)===0?`<print${i?' new-system="yes"':''}/>`:'';
-  if(i===0){inner+=`<attributes><divisions>8</divisions><key><fifths>${l.fifths}</fifths><mode>${l.mode||'major'}</mode></key><time><beats>${l.meter[0]}</beats><beat-type>${l.meter[1]}</beat-type></time><clef><sign>F</sign><line>4</line></clef></attributes><direction placement="above"><direction-type><words>${esc(l.tempoLabel||'Practice tempo')}</words></direction-type></direction><direction placement="above"><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>${tempo}</per-minute></metronome></direction-type><sound tempo="${tempo}"/></direction>`;if(l.dynamic)inner+=`<direction placement="below"><direction-type><dynamics><${l.dynamic}/></dynamics></direction-type></direction>`;}
+  if(i===0){inner+=`<attributes><divisions>${divisions}</divisions><key><fifths>${l.fifths}</fifths><mode>${l.mode||'major'}</mode></key><time><beats>${l.meter[0]}</beats><beat-type>${l.meter[1]}</beat-type></time><clef><sign>F</sign><line>4</line></clef></attributes><direction placement="above"><direction-type><words>${esc(l.tempoLabel||'Practice tempo')}</words></direction-type></direction><direction placement="above"><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>${tempo}</per-minute></metronome></direction-type><sound tempo="${tempo}"/></direction>`;if(l.dynamic)inner+=`<direction placement="below"><direction-type><dynamics><${l.dynamic}/></dynamics></direction-type></direction>`;}
+  const rp=l.repeatPlan;
+  if(rp&&i+1===rp.start)inner+='<barline location="left"><bar-style>heavy-light</bar-style><repeat direction="forward"/></barline>';
+  if(rp&&(i+1===rp.firstEnding||i+1===rp.secondEnding))inner+=`<barline location="left"><ending number="${i+1===rp.firstEnding?1:2}" type="start"/></barline>`;
   let beat=0;bar.forEach((e,j)=>{if(e.hold)inner+=`<direction placement="below"><direction-type><words>${esc(e.hold)}</words></direction-type></direction>`;
-   if(e.extension)inner+=`<direction placement="above"><direction-type><words>${e.extension==='back'?'A 弦低 1 指（后伸）':'G 弦 4 指前伸半音'}</words></direction-type></direction>`;
+   if(e.extension)inner+=`<direction placement="above"><direction-type><words>${esc(e.string)} 弦${e.position?' '+e.position+' 把位 ':''}${e.extension==='back'?'低 1 指（后伸）':'4 指前伸半音'}</words></direction-type></direction>`;
+   if(answers&&e.position&&e.position!=='I')inner+=`<direction placement="above"><direction-type><words>${esc(e.position)} 把位 · 参考指法</words></direction-type></direction>`;
    if(e.expression)inner+=`<direction placement="below"><direction-type><words>${esc(e.expression)}</words></direction-type></direction>`;
-   const p=C.pitchInfo(e.pitch),r=rhythm(e.beats),tieStart=['start','continue'].includes(e.tie),tieStop=['stop','continue'].includes(e.tie);let n=p?`<pitch><step>${p.step}</step>${p.alter?`<alter>${p.alter}</alter>`:''}<octave>${p.octave}</octave></pitch>`:'<rest/>';
-   n+=`<duration>${e.beats*8}</duration>${tieStop?'<tie type="stop"/>':''}${tieStart?'<tie type="start"/>':''}<type>${r.type}</type>${r.dotted?'<dot/>':''}`;if(p&&e.beats<4)n+='<stem>down</stem>';
+   const p=C.pitchInfo(e.pitch),r=rhythm(e.writtenBeats||e.beats),tieStart=['start','continue'].includes(e.tie),tieStop=['stop','continue'].includes(e.tie);let n=p?`<pitch><step>${p.step}</step>${p.alter?`<alter>${p.alter}</alter>`:''}<octave>${p.octave}</octave></pitch>`:(e.measureRest?'<rest measure="yes"/>':'<rest/>');
+   n+=`<duration>${Math.round(e.beats*divisions)}</duration>${tieStop?'<tie type="stop"/>':''}${tieStart?'<tie type="start"/>':''}<type>${r.type}</type>${r.dotted?'<dot/>':''}`;if(e.tuplet)n+='<time-modification><actual-notes>3</actual-notes><normal-notes>2</normal-notes><normal-type>quarter</normal-type></time-modification>';if(p&&e.beats<4)n+='<stem>down</stem>';
    if(p&&r.flags){const prev=bar[j-1],next=bar[j+1],before=prev?.pitch&&prev.beats<1&&Math.floor(beat-prev.beats)===Math.floor(beat),after=next?.pitch&&next.beats<1&&Math.floor(beat+e.beats)===Math.floor(beat);if(before||after)for(let level=1;level<=r.flags;level++){const bp=before&&rhythm(prev.beats).flags>=level,bn=after&&rhythm(next.beats).flags>=level;n+=`<beam number="${level}">${bp?(bn?'continue':'end'):bn?'begin':after?'forward hook':'backward hook'}</beam>`;}}
    let technical=e.bow?`<${e.bow}-bow/>`:'';if(answers&&p)technical+=`<fingering>${e.finger}</fingering><string>${{A:1,D:2,G:3,C:4}[e.string]}</string>`;
    const articulations=(e.breath?'<breath-mark/>':'')+(e.articulation?`<${e.articulation}/>`:'');
-   if(technical||articulations||tieStart||tieStop)n+=`<notations>${tieStop?'<tied type="stop"/>':''}${tieStart?'<tied type="start"/>':''}${technical?`<technical>${technical}</technical>`:''}${articulations?`<articulations>${articulations}</articulations>`:''}</notations>`;
-   if(answers&&p)[p.name,e.string+' string','finger '+e.finger].forEach((v,k)=>n+=`<lyric number="${k+1}"><syllabic>single</syllabic><text>${esc(v)}</text></lyric>`);
+   const slurMarks=(l.slurs||[]).flatMap(a=>[...(a.to[0]===i+1&&a.to[1]===j?['<slur number="1" type="stop"/>']:[]),...(a.from[0]===i+1&&a.from[1]===j?[`<slur number="1" type="start" placement="${a.placement||'above'}"/>`]:[])]).join(''),tuplet=e.tuplet&&(e.tuplet.index===0||e.tuplet.index===2)?`<tuplet number="1" type="${e.tuplet.index===0?'start':'stop'}" bracket="yes"/>`:'';
+   if(technical||articulations||tieStart||tieStop||slurMarks||tuplet)n+=`<notations>${tieStop?'<tied type="stop"/>':''}${tieStart?'<tied type="start"/>':''}${slurMarks}${tuplet}${technical?`<technical>${technical}</technical>`:''}${articulations?`<articulations>${articulations}</articulations>`:''}</notations>`;
+   if(answers&&p)[p.name,e.string+' string','finger '+e.finger+(e.position?' · '+e.position:'')+(e.extension?' · '+(e.extension==='back'?'low':'extend'):'')].forEach((v,k)=>n+=`<lyric number="${k+1}"><syllabic>single</syllabic><text>${esc(v)}</text></lyric>`);
    inner+='<note>'+n+'</note>';beat+=e.beats;
-  });if(i===l.bars.length-1)inner+=`<barline location="right"><bar-style>light-heavy</bar-style>${l.repeat?'<repeat direction="backward"/>':''}</barline>`;
+  });if(rp&&i+1===rp.repeatEnd)inner+='<barline location="right"><bar-style>light-heavy</bar-style><ending number="1" type="stop"/><repeat direction="backward"/></barline>';if(i===l.bars.length-1)inner+=`<barline location="right"><bar-style>light-heavy</bar-style>${rp?'<ending number="2" type="stop"/>':l.repeat?'<repeat direction="backward"/>':''}</barline>`;
   return `<measure number="${l.pickup?i:i+1}"${l.pickup&&(i===0||i===l.bars.length-1)?' implicit="yes"':''}>${inner}</measure>`;
  }).join('');
  return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><work><work-title>${esc(l.title)}${answers?' - Answers':''}</work-title></work><identification><creator type="composer">${esc(l.composer||(l.kind==='曲目'?'Folk song':'Original scale exercise'))}</creator></identification><defaults><scaling><millimeters>7</millimeters><tenths>40</tenths></scaling></defaults><part-list><score-part id="P1"><part-name>Violoncello</part-name><score-instrument id="I1"><instrument-name>Violoncello</instrument-name></score-instrument><midi-instrument id="I1"><midi-channel>1</midi-channel><midi-program>43</midi-program></midi-instrument></score-part></part-list><part id="P1">${bars}</part></score-partwise>`;
@@ -248,13 +356,13 @@ const {lessons,planned}=CelloLibrary,C=CelloCore,N=CelloNotation,$=s=>document.q
 let current=lessons[0],layers={names:false,strings:false,fingers:false,jianpu:false,bows:true},records=[],storageReady=true,pendingInput=false,initialized=false;
 const drafts=new Map();
 try{const raw=localStorage.getItem(KEY);if(raw){records=C.parseBackup(raw);}}catch(e){storageReady=false;}
-const tempoOptions=[20,30,40,50,60,70,80,90,100,110,120];$('#tempo').innerHTML=tempoOptions.map(t=>`<option value="${t}">${t}</option>`).join('');
+const tempoOptions=[20,30,40,50,60,70,80,90,100,110,116,120];$('#tempo').innerHTML=tempoOptions.map(t=>`<option value="${t}">${t}</option>`).join('');
 $('#library').innerHTML='<div class="nav-label">正在练习</div>'+lessons.map(l=>`<a class="nav-link" href="#${l.id}">${N.esc(l.title)}</a>`).join('')+(planned.length?'<div class="nav-label">第一阶段 · 待录谱</div>'+planned.map(t=>`<div class="planned">${N.esc(t)}</div>`).join(''):'');
 const localDate=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};$('#recordDate').value=localDate();
 function selection(){return {from:Number($('#from').value),to:Number($('#to').value)};}
 function validSelection(){const r=selection();if(r.to<r.from){$('#playerStatus').textContent='结束小节不能早于起始小节。';return false;}return true;}
 function renderScore(){const mobile=innerWidth<=700,per=mobile?(current.systemBars?1:2):(current.systemBars||4),sel=selection(),showSel=sel.from!==1||sel.to!==current.bars.length;let html='';for(let i=0;i<current.bars.length;i+=per)html+=`<div class="score-line">${N.renderSystem(current,i,Math.min(per,current.bars.length-i),layers,showSel?sel:null,true,mobile)}</div>`;$('#score').innerHTML=html;document.querySelectorAll('#score .note-event').forEach(el=>{const play=()=>singleNote(el.dataset.pitch);el.onclick=play;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();play();}};});}
-function printHtml(){const per=current.systemBars||4,systemCount=Math.ceil(current.bars.length/per),pages=Math.ceil(systemCount/4),perPage=Math.ceil(systemCount/pages)*per;return [false,true].flatMap(answer=>Array.from({length:pages},(_,page)=>{const start=page*perPage,end=Math.min(current.bars.length,start+perPage);let systems='';for(let i=start;i<end;i+=per)systems+=`<div class="print-score">${N.renderSystem(current,i,Math.min(per,end-i),{names:answer,strings:answer,fingers:answer,jianpu:false,bows:true},null,false)}</div>`;return `<section class="print-page"><h1 class="print-title">${N.esc(current.title)} · ${answer?'辅助版':'练习版'}</h1><div class="print-meta">${N.esc(current.english)} · ${N.esc(current.keyLabel||'D 大调')} · ${current.meter.join('/')} 拍 · 四分音符 = ${$('#tempo').value}${current.repeat?' · 末尾反复':''}<br>${N.esc(current.positionLabel||'第一把位')} / ${N.esc(current.stringsLabel||'D、A 弦')} · 第 ${C.barLabel(current,start)}–${C.barLabel(current,end-1)} 小节 · 日期：________${current.pickup?`<br>弱起 ${current.pickup} 拍，末小节 ${current.meter[0]-current.pickup} 拍，首尾合计 ${current.meter[0]} 拍。`:''}</div>${systems}<div class="print-footer">${answer?'音名、弦名、指法依次分行；指法为本练习的第一把位选择。':'先独立读谱；休止符也要数满拍。'}<br>${N.esc(current.source)}<br>Bravura · SIL Open Font License · ${(answer?pages:0)+page+1} / ${pages*2}</div></section>`;})).join('');}
+function printHtml(){const per=current.systemBars||4,systemCount=Math.ceil(current.bars.length/per),pages=Math.ceil(systemCount/(current.printSystems||4)),perPage=Math.ceil(systemCount/pages)*per;return [false,true].flatMap(answer=>Array.from({length:pages},(_,page)=>{const start=page*perPage,end=Math.min(current.bars.length,start+perPage);let systems='';for(let i=start;i<end;i+=per)systems+=`<div class="print-score">${N.renderSystem(current,i,Math.min(per,end-i),{names:answer,strings:answer,fingers:answer,jianpu:false,bows:true},null,false)}</div>`;return `<section class="print-page"><h1 class="print-title">${N.esc(current.title)} · ${answer?'辅助版':'练习版'}</h1><div class="print-meta">${N.esc(current.english)} · ${N.esc(current.keyLabel||'D 大调')} · ${current.meter.join('/')} 拍 · 四分音符 = ${$('#tempo').value}${current.repeat?' · '+N.esc(current.repeatLabel||'末尾反复'):''}<br>${N.esc(current.positionLabel||'第一把位')} / ${N.esc(current.stringsLabel||'D、A 弦')} · 第 ${C.barLabel(current,start)}–${C.barLabel(current,end-1)} 小节 · 日期：________${current.pickup?`<br>弱起 ${current.pickup} 拍，末小节 ${current.meter[0]-current.pickup} 拍，首尾合计 ${current.meter[0]} 拍。`:''}</div>${systems}<div class="print-footer">${answer?N.esc(current.fingeringNote||'音名、弦名、指法依次分行；指法为本练习的第一把位选择。'):'先独立读谱；休止符也要数满拍。'}<br>${N.esc(current.source)}<br>Bravura · SIL Open Font License · ${(answer?pages:0)+page+1} / ${pages*2}</div></section>`;})).join('');}
 function loadLesson(){if(initialized)drafts.set(current.id,{note:$('#recordNote').value,date:$('#recordDate').value,tempo:$('#recordTempo').value,status:$('#recordStatus').value});const found=lessons.find(l=>l.id===location.hash.slice(1));const next=found||lessons[0];stop(false);current=next;C.validateLesson(current);document.title=current.title+' · 大提琴练习册';$('#lessonKind').textContent=current.kind+' / '+(current.collection||'铃木第一册学习伴侣');$('#title').textContent=current.title;$('#description').textContent=current.description;$('#chips').innerHTML=[current.meter.join('/')+' 拍',current.keyLabel||'D 大调',(current.pickup?(current.bars.length-1)+' 小节 + 弱起':current.bars.length+' 小节'),current.focus].map(v=>`<span class="chip">${N.esc(v)}</span>`).join('');$('#tempo').value=current.tempo;const draft=drafts.get(current.id);$('#recordTempo').value=draft?.tempo||current.tempo;$('#recordDate').value=draft?.date||localDate();$('#recordStatus').value=draft?.status||'练习中';$('#recordNote').value=draft?.note||'';$('#recordMessage').textContent='';initialized=true;
  const options=current.bars.map((_,i)=>`<option value="${i+1}">${C.barLabel(current,i)}</option>`).join('');$('#from').innerHTML=options;$('#to').innerHTML=options;$('#from').value=1;$('#to').value=current.bars.length;$('#repeatLabel').hidden=!current.repeat;
  $('#scoreHeading').textContent=current.tempoLabel?current.tempoLabel+' · '+current.english:current.english;$('#source').textContent=current.source;$('#tips').innerHTML=current.practiceTips.map(t=>'<li>'+N.esc(t)+'</li>').join('');$('#theory').innerHTML=current.theory.map((t,i)=>`<article class="card"><div class="eyebrow">${String(i+1).padStart(2,'0')}</div><h2>${N.esc(t.title)}</h2><p>${N.esc(t.body)}</p><div class="theory-task">试一试：${N.esc(t.task)}</div></article>`).join('');
@@ -278,7 +386,7 @@ async function play(){if(!validSelection())return;stop(false);const token=genera
 function pump(){if(!run)return;const r=run,now=ctx.currentTime,horizon=now+.18;
  while(r.nextNote<r.plan.entries.length&&r.start+r.plan.entries[r.nextNote].time<horizon){const e=r.plan.entries[r.nextNote++];if(e.pitch&&!e.continuation)tone(C.pitchInfo(e.pitch).hz,Math.max(now,r.start+e.time),Math.max(.03,(e.sustain||e.duration)*(e.articulation==='staccato'?.55:.94)));}
  while(r.nextClick<r.plan.clicks.length&&r.start+r.plan.clicks[r.nextClick].time<horizon){const e=r.plan.clicks[r.nextClick++];if(e.pre||r.click)tone(e.strong?1100:780,Math.max(now,r.start+e.time),.035,true);}
- const elapsed=now-r.start;const index=r.plan.entries.findLastIndex(e=>e.time<=elapsed);if(index!==r.last&&index>=0){r.last=index;const e=r.plan.entries[index];clearActive();const el=document.querySelector(`[data-note="${current.id}:${e.bar}:${e.index}"]`);if(el)el.classList.add('active');$('#playerStatus').textContent=`第 ${C.barLabel(current,e.bar)} 小节 · ${e.pitch?C.pitchInfo(e.pitch).name:'休止'} · ${e.beats} 拍${r.plan.passes>1?` · 第 ${e.pass+1} 遍`:''}`;}
+ const elapsed=now-r.start;const index=r.plan.entries.findLastIndex(e=>e.time<=elapsed);if(index!==r.last&&index>=0){r.last=index;const e=r.plan.entries[index];clearActive();const el=document.querySelector(`[data-note="${current.id}:${e.bar}:${e.index}"]`);if(el)el.classList.add('active');$('#playerStatus').textContent=`第 ${C.barLabel(current,e.bar)} 小节 · ${e.pitch?C.pitchInfo(e.pitch).name:'休止'} · ${e.tuplet?"⅔":e.beats} 拍${r.plan.passes>1?` · 第 ${e.pass+1} 遍`:''}`;}
  if(index<0){const pre=r.plan.clicks.filter(e=>e.pre&&e.time<=elapsed).at(-1);if(pre)$('#playerStatus').textContent=`预备拍 ${pre.beat} / ${current.meter[0]}`;}
  $('#progress').style.width=Math.max(0,Math.min(100,elapsed/r.plan.duration*100))+'%';
  if(elapsed>=r.plan.duration){if(r.loop){const next=C.timeline(current,{...selection(),tempo:Number($('#tempo').value),countIn:false,repeat:$('#repeat').checked});r.start+=r.plan.duration;r.plan=next;r.nextNote=0;r.nextClick=0;r.last=-1;r.cycle++;}else{stop(false);$('#progress').style.width='100%';$('#playerStatus').textContent='播放完成。试着关掉提示，独立读一遍。';return;}}
