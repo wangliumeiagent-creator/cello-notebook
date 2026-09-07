@@ -17,7 +17,14 @@ function loadLesson(){if(initialized)drafts.set(current.id,{note:$('#recordNote'
  $('#phrases').innerHTML=current.sections.map(s=>`<button data-from="${s.from}" data-to="${s.to}">${N.esc(s.label)} · ${C.barLabel(current,s.from-1)}–${C.barLabel(current,s.to-1)}</button>`).join('');document.querySelectorAll('#phrases button').forEach(b=>b.onclick=()=>{stop();$('#from').value=b.dataset.from;$('#to').value=b.dataset.to;renderScore();$('#playerStatus').textContent=`已选第 ${C.barLabel(current,Number(b.dataset.from)-1)}–${C.barLabel(current,Number(b.dataset.to)-1)} 小节，点击播放。`;});
  document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.hash==='#'+current.id));$('#playerStatus').textContent='先读谱、拍节奏，再播放核对。';renderScore();renderRecords();$('#printRoot').innerHTML=printHtml();}
 let ctx=null,activeNodes=new Set(),run=null,frame=null,generation=0;
-async function audioReady(){if(!ctx||ctx.state==='closed')ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state!=='running')await ctx.resume();}
+async function audioReady(){
+ // Request the media playback channel before creating/resuming audio in the click handler.
+ // Unsupported browsers keep their normal Web Audio behavior.
+ try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch{}
+ if(!ctx||ctx.state==='closed'){const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('当前浏览器不支持音频，请使用 Safari 打开。');ctx=new Audio();}
+ if(ctx.state!=='running'){let timeout;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('音频尚未启动，请用 Safari 打开后再次点击播放。')),5000);})]);}finally{clearTimeout(timeout);}}
+ if(ctx.state!=='running')throw Error('音频被系统暂停，请再次点击播放。');
+}
 function tone(hz,start,duration,click=false){const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=click?'sine':'triangle';osc.frequency.value=hz;const end=start+duration;gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(click?.10:.13,start+.007);gain.gain.setValueAtTime(click?.08:.11,Math.max(start+.008,end-.025));gain.gain.linearRampToValueAtTime(0,end);osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(end+.01);activeNodes.add(osc);osc.onended=()=>{activeNodes.delete(osc);osc.disconnect();gain.disconnect();};}
 function clearActive(){document.querySelectorAll('.note-event.active').forEach(e=>e.classList.remove('active'));}
 function stop(message=true){generation++;if(frame)cancelAnimationFrame(frame);frame=null;run=null;for(const n of activeNodes)try{n.stop();}catch(e){}activeNodes.clear();clearActive();$('#progress').style.width='0%';$('#play').textContent='▶ 播放';if(message)$('#playerStatus').textContent='已停止。';}

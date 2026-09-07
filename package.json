@@ -1,6 +1,6 @@
 {
   "name": "cello-notebook",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Personal cello reading companion, local-first static edition",
   "scripts": {
