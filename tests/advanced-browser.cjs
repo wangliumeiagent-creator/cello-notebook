@@ -13,5 +13,5 @@ for(const t of ['20','30','116']){await p.selectOption('#tempo',t);await p.selec
 await p.setViewportSize({width:390,height:844});await p.waitForTimeout(200);assert.equal(await p.locator('#score .score-line').count(),73);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await p.locator('#score .score-line').nth(58).screenshot({path:'qa/laputa-advanced/mobile.png'});
 await p.setViewportSize({width:1440,height:1000});await p.selectOption('#tempo','60');
 if(process.argv.includes('--pdf')){const file='dist/scores/castle-in-the-sky-advanced.pdf';if(fs.existsSync(file))fs.copyFileSync(file,`qa/laputa-advanced/print-before-${Date.now()}.pdf`,fs.constants.COPYFILE_EXCL);await p.pdf({path:file,preferCSSPageSize:true,printBackground:true});}
-assert.deepEqual(errors,[]);console.log('Advanced: 14 lessons; complete repeat itinerary; triplet timings; real audio and sustained ties; 390px layout; PDF; no JS errors.');
+assert.deepEqual(errors,[]);console.log('Advanced: 15 lessons; complete repeat itinerary; triplet timings; real audio and sustained ties; 390px layout; PDF; no JS errors.');
 }finally{await b.close();}})().catch(e=>{console.error(e);process.exit(1);});

@@ -23,6 +23,6 @@ const root=path.resolve(__dirname,'..'),qa=path.join(root,'qa/release-0.2');fs.m
   if(l.systemBars||l.pickup)await page.screenshot({path:path.join(qa,l.id+'-mobile.png'),fullPage:true});
   await page.setViewportSize({width:1440,height:1000});
  }
- assert.deepEqual(errors,[]);console.log('14 lessons: desktop/mobile, note count, audio, 30 BPM, controls and PDF export passed.');
+ assert.deepEqual(errors,[]);console.log('15 lessons: desktop/mobile, note count, audio, 30 BPM, controls and PDF export passed.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

@@ -6,7 +6,7 @@
 
 ## 内容
 
-共 14 个练习条目，统一低音谱号。原有练习为 D 大调、D / A 弦第一把位；拓展曲目另含 D 小调改编与 E 小调进阶谱，伸张和高把位明确标注：
+共 15 个练习条目，统一低音谱号。原有练习为 D 大调、D / A 弦第一把位；拓展曲目另含 D 大调《时之伤痕》、D 小调改编与 E 小调进阶谱：
 
 | 内容 | 拍号 / 小节 |
 | --- | --- |
@@ -18,6 +18,7 @@
 | D 大调上行、下行、往返 | 4/4，各 4 小节 |
 | 天空之城主旋律 | D 小调，4/4，一拍弱起 + 51 小节，末小节三拍 |
 | 天空之城进阶版 | 原调 E 小调，4/4，73 小节；三连音、一二房反复、高把位 |
+| 时之伤痕 | D 大调，4/4，32 小节；Intro、A、B、C、D 段；D 段一二房 |
 
 铃木曲目按用户所用教材印刷第 4–8 页核对、重新排版。小星星 B、C、D 按教材给出的节奏型和主题音列展开全曲，原页的后续部分标为 etc.。保留原曲拍号；四小节限制只用于原创音阶。教材 PDF 和扫描图不包含在仓库或网站中。未增加空弦练习。
 
@@ -30,7 +31,7 @@
 - 20、30、40、50、60、70、80、90、100、110、116、120 BPM，指定小节、循环、谱面反复和预备拍。
 - 弱起按拍内位置对齐预备拍；不以休止补成完整小节。十六分音符、附点四分音符、短奏、保持音、已录入的弓法提示。
 - 点击音符听单音，配套乐理卡片；打印 / PDF 输出练习版与辅助版。
-- `dist/scores` 包含 28 份 MusicXML（可导入 MuseScore）与打印 PDF；页面不显示 MusicXML 下载按钮。
+- `dist/scores` 包含 30 份 MusicXML（可导入 MuseScore）与打印 PDF；页面不显示 MusicXML 下载按钮。
 - 本地练习记录，JSON 导出 / 导入；重复跳过，冲突保留两份。
 
 ## 使用与跨设备
@@ -58,6 +59,7 @@ npm start
 - `src/library.js`：音符、时值、第一把位指法和课程说明。
 - `src/laputa.js`：天空之城原谱转录、移调和尾声音区调整。
 - `src/advanced.js`：天空之城进阶版 73 小节、三连音、连弓与一二房路线。
+- `src/scars.js`：时之伤痕 32 小节、Intro/A/B/C/D 段与 D 段一二房。
 - `src/core.js`：拍数校验、音高、播放时间线、备份合并。
 - `src/notation.js`：SVG 和 MusicXML 4.0 生成器。
 - `src/app.js`：播放、辅助、打印、记录交互。
@@ -80,12 +82,13 @@ node tests/browser.cjs
 node tests/smoke_extra.cjs
 node tests/laputa-browser.cjs --pdf
 node tests/advanced-browser.cjs --pdf
+node tests/scars-browser.cjs --pdf
 node tests/release.cjs
 ```
 
 浏览器脚本通过 `PLAYWRIGHT_PATH` 指向 Playwright 模块，`BROWSER_PATH` 指向 Chrome / Edge 可执行文件；默认值对应原开发电脑。先启动本地服务器。release 检查会更新 dist/scores 中每课 PDF；已有文件先保存一份 QA 备份。QA 输出和测试用记录不提交到仓库。
 
-已经进行桌面 Edge、390px 手机视口、播放和打印检查，28 份 MusicXML 通过官方 4.0 Schema 校验。没有进行真实 Mac 或 MuseScore 界面验收；用户曾在真实 iPhone 上确认关闭静音后发声，后续 audioSession 兼容逻辑已做模拟测试，但没有完整真机回归。参考音为 Web Audio 合成音，只核对音高、时值和短奏间隔，不模拟真实运弓、渐强渐弱或固定换气时间；网页进入后台会停止播放。
+已经进行桌面 Edge、390px 手机视口、播放和打印检查，30 份 MusicXML 通过官方 4.0 Schema 校验。没有进行真实 Mac 或 MuseScore 界面验收；用户曾在真实 iPhone 上确认关闭静音后发声，后续 audioSession 兼容逻辑已做模拟测试，但没有完整真机回归。参考音为 Web Audio 合成音，只核对音高、时值和短奏间隔，不模拟真实运弓、渐强渐弱或固定换气时间；网页进入后台会停止播放。
 
 ## 素材与范围
 
