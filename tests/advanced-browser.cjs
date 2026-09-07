@@ -4,7 +4,7 @@ const {chromium}=require(process.env.PLAYWRIGHT_PATH||'C:/Users/Administrator/.c
 const p=await b.newPage({viewport:{width:1440,height:1000}}),errors=[];p.on('pageerror',e=>errors.push(e.message));
 await p.addInitScript(()=>{window.tones=[];const create=AudioContext.prototype.createOscillator;AudioContext.prototype.createOscillator=function(){const o=create.call(this),start=o.start.bind(o);o.start=(...args)=>{tones.push(o.frequency.value);return start(...args);};return o;};});
 await p.goto(process.env.SITE_URL||'http://127.0.0.1:4317/#castle-in-the-sky-advanced');await p.evaluate(()=>document.fonts.ready);
-assert.equal(await p.locator('#title').textContent(),'天空之城进阶版');assert.equal(await p.locator('#score .score-line').count(),37);assert.equal(await p.locator('.nav-link').count(),14);
+assert.equal(await p.locator('#title').textContent(),'天空之城进阶版');assert.equal(await p.locator('#score .score-line').count(),19);assert.equal(await p.locator('.nav-link').count(),14);
 await p.click('#answers');await p.check('[data-layer=jianpu]');
 fs.mkdirSync('qa/laputa-advanced',{recursive:true});for(const n of [0,7,10,16,28,29,30,32,33,36])await p.locator('#score .score-line').nth(n).screenshot({path:`qa/laputa-advanced/render-${n}.png`});
 await p.selectOption('#tempo','116');await p.uncheck('#countIn');await p.check('#repeat');await p.click('#play');await p.waitForTimeout(60);assert.ok(Math.abs((await p.evaluate(()=>CelloApp.plan().duration))-384*60/116)<1e-7);assert.equal(await p.evaluate(()=>CelloApp.audioState()),'running');await p.click('#stop');

@@ -49,7 +49,7 @@
 | `src/laputa.js` / `src/advanced.js` | 两个天空之城版本的数据、辅助指法和乐理内容 |
 | `src/core.js` | 音高、拍数和结构校验、播放路线、延音合并、记录备份合并 |
 | `src/notation.js` | SVG 与 MusicXML；临时记号、三连音、连线、反复和辅助层 |
-| `src/app.js` | 交互、Web Audio、播放高亮、记录、打印分页 |
+| `src/app.js` | 交互、Web Audio、播放高亮、记录、打印分页；两首天空之城桌面谱面每行 4 小节，手机端每行 1 小节 |
 | `src/index.html` / `src/styles.css` | 页面骨架与样式 |
 | `scripts/build.cjs` | 内嵌模块并写入 dist；生成每课练习/辅助两份 XML |
 | `dist/scores/` | 28 份 XML、14 份预生成 PDF；进阶版 PDF 为 26 页 |
