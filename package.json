@@ -1,0 +1,8 @@
+{
+  "name": "cello-notebook-portable",
+  "private": true,
+  "version": "0.2.0",
+  "scripts": {
+    "start": "node start-server.cjs"
+  }
+}
