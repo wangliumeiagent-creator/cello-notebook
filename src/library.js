@@ -51,6 +51,7 @@ children.bars[9][1].expression='cresc.';children.bars[14][0].expression='f';chil
 children.theory=[{title:'弱起不是漏拍',body:'开头 A 是半拍弱起，位于第 2 拍的后半拍。末小节为附点四分音符，共一拍半；首尾合起来正好两拍。网页把开头标为“弱起”，后续按 1–16 编号。预备拍数 1、2 后，在“2 和”进入。',task:'打开预备拍，听清 A 在第二拍后半拍进入，下一音落在强拍。'},{title:'附点与休止',body:'附点把原音符延长一半：四分音符一拍，加点后是一拍半。八分休止符是半拍。渐强 cresc. 和渐弱 dim. 提示力度变化，参考音只核对音高时值，不模拟力度变化。',task:'数末尾 D 的“一、和、二”，在“二和”接反复的弱起 A。'}];
 lessons.splice(1,0,twinkle,...variations,children,rhody,row);
 lessons.forEach(l=>{if(!l.sections.length)l.sections=Array.from({length:Math.ceil((l.bars.length-(l.pickup?1:0))/4)},(_,i)=>({label:'乐句 '+(i+1),from:i*4+1+(l.pickup?1:0),to:Math.min(l.bars.length,(i+1)*4+(l.pickup?1:0))}));});
-const library={version:2,lessons,planned:[]};
+lessons.push((typeof module!=='undefined'&&module.exports?require('./laputa.js'):root.CelloLaputa).lesson);
+const library={version:3,lessons,planned:[]};
 if(typeof module!=='undefined'&&module.exports)module.exports=library;else root.CelloLibrary=library;
 })(globalThis);

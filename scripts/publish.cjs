@@ -4,7 +4,7 @@ const path=require('node:path');process.chdir(path.resolve(__dirname,'..'));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 if(git('branch','--show-current')!=='main')throw Error('请在 main 分支发布。');
 if(git('status','--porcelain','--untracked-files=no'))throw Error('请先构建并提交所有修改，再发布。');
-execFileSync(process.execPath,['--test','tests/core.test.cjs'],{stdio:'inherit'});
+execFileSync(process.execPath,['--test','tests/core.test.cjs','tests/laputa.test.cjs'],{stdio:'inherit'});
 const parent=[];
 if(git('ls-remote','--heads','origin','gh-pages')){
  execFileSync('git',['fetch','origin','refs/heads/gh-pages:refs/remotes/origin/gh-pages'],{stdio:'inherit'});

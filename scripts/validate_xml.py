@@ -13,8 +13,8 @@ for file in sorted((root/'dist'/'scores').glob('*.musicxml')):
  expected=int(doc.findtext('.//time/beats'));division=int(doc.findtext('.//divisions'))
  measures=doc.findall('.//part/measure')
  totals=[sum(int(n.findtext('duration')) for n in m.findall('note')) for m in measures]
- if file.name.startswith('o-come-little-children'):
-  assert totals[0]==2 and totals[-1]==6 and totals[0]+totals[-1]==division*expected
+ if measures[0].get('implicit')=='yes':
+  assert 0<totals[0]<division*expected and totals[0]+totals[-1]==division*expected
   assert all(t==division*expected for t in totals[1:-1])
  else:
   assert all(t==division*expected for t in totals)
