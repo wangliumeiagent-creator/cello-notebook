@@ -1,12 +1,12 @@
 {
   "name": "cello-notebook",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Personal cello reading companion, local-first static edition",
   "scripts": {
     "build": "node scripts/build.cjs",
     "start": "node scripts/serve.cjs",
-    "test": "node --test tests/core.test.cjs tests/laputa.test.cjs",
+    "test": "node --test tests/core.test.cjs tests/laputa.test.cjs tests/advanced.test.cjs",
     "publish": "node scripts/publish.cjs"
   },
   "engines": {

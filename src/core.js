@@ -7,7 +7,10 @@ function barBeats(l,i){return l.bars[i].reduce((sum,e)=>sum+e.beats,0);}
 function validateLesson(l){
  if(!l||!Array.isArray(l.bars)||l.meter[1]!==4)throw Error('不支持的练习结构');
  if(l.pickup!==undefined&&!(l.pickup>0&&l.pickup<l.meter[0]&&l.bars.length>1))throw Error('无效弱起');
- l.bars.forEach((bar,i)=>{const expected=l.pickup&&i===0?l.pickup:l.pickup&&i===l.bars.length-1?l.meter[0]-l.pickup:l.meter[0];if(!bar.length||Math.abs(barBeats(l,i)-expected)>1e-9)throw Error(`第 ${barLabel(l,i)} 小节拍数不符`);bar.forEach(e=>{if(![.125,.25,.375,.5,.75,1,1.5,2,3,4].includes(e.beats))throw Error('不支持的时值');if(e.pitch){pitchInfo(e.pitch);if(!['A','D','G','C'].includes(e.string)||![0,1,2,3,4].includes(e.finger))throw Error('缺少指法');}});});
+ l.bars.forEach((bar,i)=>{const expected=l.pickup&&i===0?l.pickup:l.pickup&&i===l.bars.length-1?l.meter[0]-l.pickup:l.meter[0];if(!bar.length||Math.abs(barBeats(l,i)-expected)>1e-9)throw Error(`第 ${barLabel(l,i)} 小节拍数不符`);bar.forEach(e=>{if(!(e.tuplet&&e.writtenBeats===1&&Math.abs(e.beats-2/3)<1e-9)&&![.125,.25,.375,.5,.75,1,1.5,2,3,4].includes(e.beats))throw Error('不支持的时值');if(e.pitch){pitchInfo(e.pitch);if(!['A','D','G','C'].includes(e.string)||![0,1,2,3,4].includes(e.finger))throw Error('缺少指法');}});});
+ l.bars.forEach(bar=>{bar.forEach((e,i)=>{if(!e.tuplet)return;const t=e.tuplet;if(t.actual!==3||t.normal!==2||![0,1,2].includes(t.index))throw Error('无效三连音');const group=bar.slice(i-t.index,i-t.index+3);if(group.length!==3||group.some((n,k)=>!n.tuplet||n.tuplet.index!==k||n.tuplet.group!==t.group||n.writtenBeats!==1||Math.abs(n.beats-2/3)>1e-9))throw Error('三连音组不完整');});});
+ if(l.repeatPlan){const r=l.repeatPlan;if(![r.start,r.firstEnding,r.repeatEnd,r.secondEnding].every(Number.isInteger)||r.start<1||r.start>=r.firstEnding||r.firstEnding>r.repeatEnd||r.secondEnding!==r.repeatEnd+1||r.secondEnding>l.bars.length)throw Error('无效反复路线');}
+ for(const a of l.slurs||[]){const [fb,fn]=a.from,[tb,tn]=a.to;if(!l.bars[fb-1]?.[fn]?.pitch||!l.bars[tb-1]?.[tn]?.pitch||fb>tb||(fb===tb&&fn>=tn))throw Error('无效连弓线');}
  const flat=l.bars.flat();flat.forEach((e,i)=>{if(e.tie&&!['start','continue','stop'].includes(e.tie))throw Error('无效延音线');if(['start','continue'].includes(e.tie)){const n=flat[i+1];if(!e.pitch||n?.pitch!==e.pitch||!['continue','stop'].includes(n.tie))throw Error('延音线必须连接相同音高');}if(['continue','stop'].includes(e.tie)&&(!['start','continue'].includes(flat[i-1]?.tie)||flat[i-1].pitch!==e.pitch))throw Error('延音线缺少起点');});return true;
 }
 function timeline(l,{from=1,to=l.bars.length,tempo=60,countIn=false,repeat=false}={}){
@@ -15,7 +18,8 @@ function timeline(l,{from=1,to=l.bars.length,tempo=60,countIn=false,repeat=false
  const beatSeconds=60/tempo,lead=countIn?(l.pickup&&from===1?l.meter[0]-l.pickup:l.meter[0]):0;let time=lead*beatSeconds;const entries=[],clicks=[];
  for(let b=0;b<lead;b++)clicks.push({time:b*beatSeconds,strong:b===0,pre:true,beat:b+1});
  const passes=repeat&&l.repeat&&from===1&&to===l.bars.length?2:1;
- for(let pass=0;pass<passes;pass++)for(let bar=from-1;bar<to;bar++){
+ const route=[];if(passes===2&&l.repeatPlan){const r=l.repeatPlan;for(let bar=0;bar<r.repeatEnd;bar++)route.push({bar,pass:0});for(let bar=r.start-1;bar<r.firstEnding-1;bar++)route.push({bar,pass:1});for(let bar=r.secondEnding-1;bar<to;bar++)route.push({bar,pass:1});}else for(let pass=0;pass<passes;pass++)for(let bar=from-1;bar<to;bar++)route.push({bar,pass});
+ for(const {bar,pass} of route){
   const duration=barBeats(l,bar),offset=l.pickup&&bar===0?l.meter[0]-l.pickup:0;
   for(let b=Math.ceil(offset);b<offset+duration;b++)clicks.push({time:time+(b-offset)*beatSeconds,strong:b===0,bar,beat:b+1,pass,pre:false});
   let elapsed=0;l.bars[bar].forEach((event,index)=>{entries.push({time:time+elapsed*beatSeconds,duration:event.beats*beatSeconds,bar,index,pass,...event});elapsed+=event.beats;});time+=duration*beatSeconds;
