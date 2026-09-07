@@ -38,6 +38,10 @@ Windows、Mac、iPhone 在浏览器打开同一个网站地址。iPhone 可在 S
 
 记录只保存在当前设备和当前浏览器，不自动跨设备同步。换电脑时，在“练习记录”导出 JSON，再在另一台电脑导入。从本地文件 / localhost 改到 GitHub 网址，也需要先导出再导入。保留原备份；关闭隐私浏览或清除网站数据可能使本地记录不可用。
 
+## 跨电脑继续编辑
+
+从新电脑接手请先读 [项目交接](docs/HANDOFF.md)，再按 [Windows / Mac 开发与发布](docs/DEVELOPMENT.md) 配置。AI 协作约定放在 [AGENTS.md](AGENTS.md)，随 Git 一起同步。
+
 ## 本地开发
 
 Node.js 18 或以上，无 npm 依赖：
@@ -59,7 +63,7 @@ npm start
 - `scripts/build.cjs`：生成独立 HTML 与 MusicXML，不联网。会更新同名生成文件，不删除额外文件。
 - `scripts/serve.cjs`：本地服务器，仅绑定 127.0.0.1。
 
-修改源文件后重新构建。GitHub Pages 从 gh-pages 分支发布，main 保存完整源码。当前凭据没有 workflow 权限，所以未启用自定义 Actions 工作流。修改后先构建并提交，再运行 `npm run publish`；该命令检查测试和工作区状态，推送 main，并把 dist 推送到 gh-pages。GitHub 会自动部署 gh-pages 的更新。新电脑需先配置 GitHub 的 Git 登录凭据（例如 `gh auth setup-git`）。
+修改源文件后重新构建。GitHub Pages 从 gh-pages 分支发布，main 保存完整源码。项目未启用自定义 Actions 工作流；Pages 使用 GitHub 自动生成的部署任务。修改后先构建并提交，再运行 `npm run publish`；该命令检查测试和工作区状态，推送 main，并把 dist 推送到 gh-pages。GitHub 会自动部署 gh-pages 的更新。新电脑需先配置 GitHub 的 Git 登录凭据（例如 `gh auth setup-git`）。
 
 PDF 为预生成文件；修改谱面后用页面“打印 / PDF”更新相应 PDF，或运行下面的浏览器发布检查。构建本身不会重新生成 PDF。
 
@@ -80,7 +84,7 @@ node tests/release.cjs
 
 浏览器脚本通过 `PLAYWRIGHT_PATH` 指向 Playwright 模块，`BROWSER_PATH` 指向 Chrome / Edge 可执行文件；默认值对应原开发电脑。先启动本地服务器。release 检查会更新 dist/scores 中每课 PDF；已有文件先保存一份 QA 备份。QA 输出和测试用记录不提交到仓库。
 
-已经进行桌面 Edge、390px 手机视口、播放和打印检查，28 份 MusicXML 通过官方 4.0 Schema 校验。没有进行真实 Mac / iPhone 或 MuseScore 界面验收。参考音为 Web Audio 合成音，只核对音高、时值和短奏间隔，不模拟真实运弓、渐强渐弱或固定换气时间；网页进入后台会停止播放。
+已经进行桌面 Edge、390px 手机视口、播放和打印检查，28 份 MusicXML 通过官方 4.0 Schema 校验。没有进行真实 Mac 或 MuseScore 界面验收；用户曾在真实 iPhone 上确认关闭静音后发声，后续 audioSession 兼容逻辑已做模拟测试，但没有完整真机回归。参考音为 Web Audio 合成音，只核对音高、时值和短奏间隔，不模拟真实运弓、渐强渐弱或固定换气时间；网页进入后台会停止播放。
 
 ## 素材与范围
 
