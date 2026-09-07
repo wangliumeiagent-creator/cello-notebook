@@ -20,7 +20,7 @@ function renderSystem(l,start,count,layers={},selection=null,interactive=true,mo
  const rowNames={names:'音名',strings:'弦名',fingers:'指法',jianpu:'简谱 1='+(l.jianpuKey||'D')};rows.forEach((r,i)=>s+=text(rowNames[r],14,191+i*25,'annotation rowlabel'));
  if(start===0&&layers.bows&&l.dynamic)s+=text(l.dynamic,33,156,'annotation','font-style="italic" font-weight="bold"');
  for(let i=0;i<count;i++){
-  const bi=start+i,bar=l.bars[bi],bx=left+i*bw,scale=(bw-40)/l.meter[0];s+=text(C.barLabel(l,bi),bx+7,l.topPadding?-30:14,'bar-number');let beat=0;
+  const bi=start+i,bar=l.bars[bi],bx=left+i*bw,scale=(bw-40)/l.meter[0];s+=text(C.barLabel(l,bi),bx+7,l.topPadding?-30:14,'bar-number');const tempoMark=(l.tempoMarks||[]).find(t=>t.bar===bi+1);if(tempoMark)s+=text(tempoMark.label,bx+28,l.topPadding?-12:30,'annotation','font-size="11"');let beat=0;
   const gap=l.minNoteSpacing||0,flex=(bw-40-gap*bar.length)/l.meter[0],accidentals=new Map();const points=bar.map((e,ni)=>{const p={x:bx+25+ni*gap+beat*(gap?flex:scale),y:e.pitch?C.pitchInfo(e.pitch).y:96,beat,event:e};beat+=e.beats;return p;});
   points.forEach((p,n)=>positions.set(`${bi+1}:${n}`,p));
   const beams=new Map(),groups=[];for(let j=0;j<points.length;){const a=j,p=points[j];if(!p.event.pitch||(p.event.writtenBeats||p.event.beats)>=1){j++;continue;}while(j+1<points.length&&points[j+1].event.pitch&&(points[j+1].event.writtenBeats||points[j+1].event.beats)<1&&Math.floor(points[j+1].beat)===Math.floor(p.beat))j++;if(j>a){const y=Math.max(...points.slice(a,j+1).map(p=>p.y))+35;for(let k=a;k<=j;k++)beams.set(k,{y});groups.push({a,z:j,y});}j++;}
@@ -60,6 +60,7 @@ function musicxml(l,answers=false,tempo=l.tempo){
  C.validateLesson(l);const divisions=l.divisions||8;const bars=l.bars.map((bar,i)=>{
   let inner=i%(l.systemBars||4)===0?`<print${i?' new-system="yes"':''}/>`:'';
   if(i===0){inner+=`<attributes><divisions>${divisions}</divisions><key><fifths>${l.fifths}</fifths><mode>${l.mode||'major'}</mode></key><time><beats>${l.meter[0]}</beats><beat-type>${l.meter[1]}</beat-type></time><clef><sign>F</sign><line>4</line></clef></attributes><direction placement="above"><direction-type><words>${esc(l.tempoLabel||'Practice tempo')}</words></direction-type></direction><direction placement="above"><direction-type><metronome><beat-unit>quarter</beat-unit><per-minute>${tempo}</per-minute></metronome></direction-type><sound tempo="${tempo}"/></direction>`;if(l.dynamic)inner+=`<direction placement="below"><direction-type><dynamics><${l.dynamic}/></dynamics></direction-type></direction>`;}
+  const tempoMark=(l.tempoMarks||[]).find(t=>t.bar===i+1);if(tempoMark)inner+=`<direction placement="above"><direction-type><words>${esc(tempoMark.label)}</words></direction-type><sound tempo="${tempoMark.tempo}"/></direction>`;
   const rp=l.repeatPlan;
   if(rp&&i+1===rp.start)inner+='<barline location="left"><bar-style>heavy-light</bar-style><repeat direction="forward"/></barline>';
   if(rp&&(i+1===rp.firstEnding||i+1===rp.secondEnding))inner+=`<barline location="left"><ending number="${i+1===rp.firstEnding?1:2}" type="start"/></barline>`;
