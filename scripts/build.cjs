@@ -1,0 +1,12 @@
+const fs=require('node:fs'),path=require('node:path');
+const ROOT=path.resolve(__dirname,'..'),out=path.join(ROOT,'dist');
+const lib=require('../src/library.js'),core=require('../src/core.js'),notation=require('../src/notation.js');
+for(const lesson of lib.lessons)core.validateLesson(lesson);
+fs.mkdirSync(out,{recursive:true});fs.mkdirSync(path.join(out,'scores'),{recursive:true});
+const src=name=>fs.readFileSync(path.join(ROOT,'src',name),'utf8');
+const font=fs.readFileSync(path.join(ROOT,'assets','Bravura.otf')).toString('base64');
+const html=src('index.html').replace('__CSS__',src('styles.css').replace('__FONT__',font)).replace('__LIBRARY__',src('library.js')).replace('__CORE__',src('core.js')).replace('__NOTATION__',src('notation.js')).replace('__APP__',src('app.js'));
+fs.writeFileSync(path.join(out,'index.html'),html);
+for(const lesson of lib.lessons)for(const answer of [false,true])fs.writeFileSync(path.join(out,'scores',lesson.id+(answer?'-answers':'-practice')+'.musicxml'),notation.musicxml(lesson,answer));
+fs.copyFileSync(path.join(ROOT,'assets','Bravura-LICENSE.txt'),path.join(out,'Bravura-LICENSE.txt'));
+console.log(`Built ${lib.lessons.length} lessons into ${out}`);

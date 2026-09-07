@@ -1,0 +1,16 @@
+/qa/
+*.zip
+node_modules/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pdf
+!/dist/scores/*.pdf
+*records*.json
+*backup*.json
+
+# Retained locally as an optional future Actions configuration.
+/.github/workflows/pages.yml

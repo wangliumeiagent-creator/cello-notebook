@@ -1,0 +1,79 @@
+# 大提琴练习册
+
+铃木大提琴第一册、第一把位的个人学习伴侣。纯静态网站，不需要账号或后端。
+
+网站：https://wangliumeiagent-creator.github.io/cello-notebook/
+
+## 内容
+
+共 12 个练习条目，低音谱号、D 大调、D / A 弦第一把位：
+
+| 内容 | 拍号 / 小节 |
+| --- | --- |
+| 风之歌 | 2/4，14 小节，末尾反复 |
+| 小星星主题及 A–D 四种变奏 | 4/4，各 12 小节 |
+| 快来，小伙伴（O Come, Little Children） | 2/4，半拍弱起 + 16 小节；末小节 1.5 拍，首尾互补；反复 |
+| 告诉罗娣阿姨 | 4/4，12 小节 |
+| 轻舟荡漾 | 4/4，16 小节 |
+| D 大调上行、下行、往返 | 4/4，各 4 小节 |
+
+曲目按用户所用教材印刷第 4–8 页核对、重新排版。小星星 B、C、D 按教材给出的节奏型和主题音列展开全曲，原页的后续部分标为 etc.。保留原曲拍号；四小节限制只用于原创音阶。教材 PDF 和扫描图不包含在仓库或网站中。未增加空弦练习。
+
+- 音名、弦名、指法、简谱分别开关；“显示辅助”一次打开前三项。
+- 20、30、40、50、60、70、80、90、100、120 BPM，指定小节、循环、谱面反复和预备拍。
+- 弱起按拍内位置对齐预备拍；不以休止补成完整小节。十六分音符、附点四分音符、短奏、保持音、已录入的弓法提示。
+- 点击音符听单音，配套乐理卡片；打印 / PDF 输出练习版与辅助版。
+- `dist/scores` 包含 24 份 MusicXML（可导入 MuseScore）与打印 PDF；页面不显示 MusicXML 下载按钮。
+- 本地练习记录，JSON 导出 / 导入；重复跳过，冲突保留两份。
+
+## 使用与跨设备
+
+Windows、Mac、iPhone 在浏览器打开同一个网站地址。iPhone 可在 Safari 分享菜单中选择“添加到主屏幕”；播放需手动点击。首次在线加载后不要假设无网仍能打开，网站没有离线缓存服务。
+
+记录只保存在当前设备和当前浏览器，不自动跨设备同步。换电脑时，在“练习记录”导出 JSON，再在另一台电脑导入。从本地文件 / localhost 改到 GitHub 网址，也需要先导出再导入。保留原备份；关闭隐私浏览或清除网站数据可能使本地记录不可用。
+
+## 本地开发
+
+Node.js 18 或以上，无 npm 依赖：
+
+```sh
+npm test
+npm run build
+npm start
+```
+
+打开 `http://127.0.0.1:4317`。也可直接打开 `dist/index.html`，但本地文件的存储行为取决于浏览器。
+
+- `src/library.js`：音符、时值、第一把位指法和课程说明。
+- `src/core.js`：拍数校验、音高、播放时间线、备份合并。
+- `src/notation.js`：SVG 和 MusicXML 4.0 生成器。
+- `src/app.js`：播放、辅助、打印、记录交互。
+- `scripts/build.cjs`：生成独立 HTML 与 MusicXML，不联网。会更新同名生成文件，不删除额外文件。
+- `scripts/serve.cjs`：本地服务器，仅绑定 127.0.0.1。
+
+修改源文件后重新构建。GitHub Pages 从 gh-pages 分支发布，main 保存完整源码。当前凭据没有 workflow 权限，所以未启用自定义 Actions 工作流。修改后先构建并提交，再运行 `npm run publish`；该命令检查测试和工作区状态，推送 main，并把 dist 推送到 gh-pages。GitHub 会自动部署 gh-pages 的更新。新电脑需先配置 GitHub 的 Git 登录凭据（例如 `gh auth setup-git`）。
+
+PDF 为预生成文件；修改谱面后用页面“打印 / PDF”更新相应 PDF，或运行下面的浏览器发布检查。构建本身不会重新生成 PDF。
+
+## 验证
+
+`npm test`：音列、时值、弱起 / 末小节互补、反复、20 / 30 BPM、十六分音符和备份冲突。
+
+可选扩展检查（开发环境另需 Python lxml、Playwright 和浏览器）：
+
+```sh
+python scripts/validate_xml.py
+node tests/browser.cjs
+node tests/smoke_extra.cjs
+node tests/release.cjs
+```
+
+浏览器脚本通过 `PLAYWRIGHT_PATH` 指向 Playwright 模块，`BROWSER_PATH` 指向 Chrome / Edge 可执行文件；默认值对应原开发电脑。先启动本地服务器。release 检查会更新 dist/scores 中每课 PDF；已有文件先保存一份 QA 备份。QA 输出和测试用记录不提交到仓库。
+
+已经进行桌面 Edge、390px 手机视口、播放和打印检查，24 份 MusicXML 通过官方 4.0 Schema 校验。没有进行真实 Mac / iPhone 或 MuseScore 界面验收。参考音为 Web Audio 合成音，只核对音高、时值和短奏间隔，不模拟真实运弓、渐强渐弱或固定换气时间；网页进入后台会停止播放。
+
+## 素材与范围
+
+Bravura 字体遵循 SIL Open Font License，见 `assets/Bravura-LICENSE.txt`。MusicXML Schema 保留原文件的 W3C 版权与协议声明。教材相关曲目和编辑提示为用户提供资料的转录，未对它们另行授予开源许可。本项目不是铃木教材官方产品。
+
+现有微信小程序未改动，本阶段交付网页。

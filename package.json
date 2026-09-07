@@ -1,0 +1,15 @@
+{
+  "name": "cello-notebook",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Personal cello reading companion, local-first static edition",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "start": "node scripts/serve.cjs",
+    "test": "node --test tests/core.test.cjs",
+    "publish": "node scripts/publish.cjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
