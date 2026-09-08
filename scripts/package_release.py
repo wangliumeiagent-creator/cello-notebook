@@ -18,5 +18,5 @@ with zipfile.ZipFile(output,'x',compression=zipfile.ZIP_DEFLATED) as z:
 with zipfile.ZipFile(output) as z:
  assert z.testzip() is None
  assert 'cello-notebook/index.html' in z.namelist()
- assert len([n for n in z.namelist() if n.endswith('.musicxml')])==30
+ assert len([n for n in z.namelist() if n.endswith('.musicxml')])==32
 print(str(output));print(f'{len(files)} files; archive integrity verified.')

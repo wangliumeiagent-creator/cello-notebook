@@ -54,6 +54,7 @@ lessons.forEach(l=>{if(!l.sections.length)l.sections=Array.from({length:Math.cei
 lessons.push((typeof module!=='undefined'&&module.exports?require('./laputa.js'):root.CelloLaputa).lesson);
 lessons.push((typeof module!=='undefined'&&module.exports?require('./advanced.js'):root.CelloAdvanced).lesson);
 lessons.push((typeof module!=='undefined'&&module.exports?require('./scars.js'):root.CelloScars).lesson);
+lessons.push((typeof module!=='undefined'&&module.exports?require('./c-major.js'):root.CelloCMajor).lesson);
 const library={version:3,lessons,planned:[]};
 if(typeof module!=='undefined'&&module.exports)module.exports=library;else root.CelloLibrary=library;
 })(globalThis);

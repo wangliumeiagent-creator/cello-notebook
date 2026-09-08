@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node scripts/build.cjs",
     "start": "node scripts/serve.cjs",
-    "test": "node --test tests/core.test.cjs tests/laputa.test.cjs tests/advanced.test.cjs tests/scars.test.cjs",
+    "test": "node --test tests/core.test.cjs tests/laputa.test.cjs tests/advanced.test.cjs tests/scars.test.cjs tests/cmajor.test.cjs",
     "publish": "node scripts/publish.cjs"
   },
   "engines": {
