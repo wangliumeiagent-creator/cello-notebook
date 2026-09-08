@@ -202,6 +202,35 @@ const slurs=[];for(const b of [5,9,13,21,25])slurs.push({from:[b,0],to:[b,1]});s
 const lesson={id:'scars-of-time',title:'时之伤痕',english:'Scars of Time · Chrono Cross',composer:'Yasunori Mitsuda',kind:'曲目',collection:'拓展曲目',meter:[4,4],key:'D',mode:'major',keyLabel:'D 大调',fifths:2,jianpuTonic:'D3',jianpuKey:'D',jianpuFifths:2,tempo:80,sourceTempo:80,tempoLabel:'Intro / A（原谱 ♩ = 80；B 段 ♩ = 112）',tempoMarks:[{bar:1,tempo:80,label:'Intro / A  ♩ = 80'},{bar:17,tempo:112,label:'B  ♩ = 112'}],repeat:true,repeatLabel:'D 段一二房',repeatPlan:{start:29,firstEnding:31,repeatEnd:31,secondEnding:32},systemBars:4,minNoteSpacing:30,stringsLabel:'C、G、D、A 弦',positionLabel:'初学者版 · 尽量第一把位',fingeringNote:'图中数字为本版第一把位参考指法；B 段使用 C 弦低音，换弦与运弓请跟老师确认。',description:'《时之伤痕》初学者大提琴版 · Intro、A、B、C、D 段',source:'按你提供的《Scars of Time / 时之伤痕》大提琴初学者谱面转录；保留段落、速度、反复与图中参考指法。',focus:'分段识谱、低音 C 弦与第一把位',bars,slurs,sections:[{label:'Intro',from:1,to:4},{label:'A 段',from:5,to:16},{label:'B 段',from:17,to:24},{label:'C 段',from:25,to:28},{label:'D 段',from:29,to:32}],theory:[{title:'先按段落识谱',body:'Intro 由低音分解和弦开始，A 段进入旋律，B 段转到 C 弦低音，C、D 段再回到旋律和反复。先按页面上的段落按钮练习，不必一次从头弹到尾。',task:'先练 Intro 1–4 小节，再练 A 段前四小节。'},{title:'B 段的 C 弦',body:'B 段的 C 与 D 是低音区音符，辅助行会标出 C 弦。低音全音符要数满四拍；随后是均匀的十六分音符型。',task:'先拍四拍，再把 C 弦空弦和低 1 指放进去。'},{title:'D 段的反复',body:'D 段有一二房：第一次演奏第 29–31 小节后回到第 29 小节，第二次跳到第 32 小节结束。勾选“按谱反复”时网页会执行这条路线。',task:'单独练第 29–32 小节，先读房子记号再播放。'},{title:'速度分段练习',body:'谱面标出 Intro / A 为四分音符 80，B 段为 112。网页以 80 作为默认练习速度；B 段先降速，稳定后再逐步提高。',task:'从 30 或 60 拍开始，确认十六分音符均匀后再加速。'}],practiceTips:['先选择 Intro 或 A 段按钮，熟悉旋律后再进入 B、C、D。','图中标有数字指法，本版照录为参考；低音 C 弦的手型请让老师确认。','显示辅助可以打开音名、弦名和指法，简谱仍然可以单独隐藏。','网页播放是合成参考音，用于核对音高和节奏，不模拟完整大提琴音色。']};
 const api={lesson};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.CelloScars=api;
 })(globalThis);
+(function(root){
+'use strict';
+// Suzuki Book 1 companion: one-octave C-major scale in first position.
+// C2–F2 are on the C string; G2–C3 are on the G string.
+const map={C2:['C',0],D2:['C',1],E2:['C',3],F2:['C',4],G2:['G',0],A2:['G',1],B2:['G',3],C3:['G',4]};
+const note=(pitch,beats=1,extra={})=>({pitch,beats,string:map[pitch][0],finger:map[pitch][1],...extra});
+const bars=[
+ ['C2','D2','E2','F2'],
+ ['G2','A2','B2','C3'],
+ ['C3','B2','A2','G2'],
+ ['F2','E2','D2','C2']
+].map(pitches=>pitches.map(p=>note(p)));
+const lesson={
+ id:'c-major-scale',title:'C 大调音阶',english:'C major · one octave',kind:'音阶',collection:'铃木第一册 · 音阶补充',
+ meter:[4,4],key:'C',mode:'major',keyLabel:'C 大调',fifths:0,jianpuTonic:'C2',jianpuKey:'C',jianpuFifths:0,
+ tempo:60,repeat:false,systemBars:4,stringsLabel:'C、G 弦',positionLabel:'第一把位 · 不换把、不伸张',
+ description:'铃木第一册配套 · C、G 弦第一把位 · 一八度上行与下行',
+ source:'按铃木第一册音阶学习方向整理的配套练习；音符与指法供课堂复习使用。',
+ focus:'认识 C 大调无升降号音列与 C/G 弦换弦',bars,sections:[{label:'上行低音区',from:1,to:2},{label:'下行低音区',from:3,to:4}],
+ theory:[
+  {title:'C 大调没有调号',body:'C 大调的音列是 C、D、E、F、G、A、B、C，五线谱开头没有升号或降号。先看音符在谱表上的位置，再读出音名。',task:'遮住辅助，逐个读出四小节的音名。'},
+  {title:'C 弦到 G 弦的换弦',body:'C、D、E、F 在 C 弦使用 0–1–3–4 指；G、A、B、C 在 G 弦使用 0–1–3–4 指。两根弦都保持第一把位，G2 是换弦后的空弦。',task:'先只练第 1–2 小节，换弦时保持拍子和弓速均匀。'},
+  {title:'上行与下行',body:'前两小节从低音 C 上行到高音 C，后两小节原路返回。每小节四个四分音符，数满 1、2、3、4。',task:'稳定后用 20 或 30 拍练习，每个音保持一拍。'}
+ ],
+ practiceTips:['先唱或说音名，再把 0–1–3–4 指法放到对应琴弦。','保持第一把位；C 弦与 G 弦换弦处先停弓确认姿势，再连起来练。','网页播放是音高与拍点参考，弓法和手型以老师示范为准。'],
+ fingeringNote:'辅助标注为 C、G 弦第一把位参考：两弦均为 0–1–3–4；请让老师确认手型与换弦动作。'
+};
+const api={lesson};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.CelloCMajor=api;
+})(globalThis);
 </script><script>(function(root){
 'use strict';
 const fingering={D3:{string:'D',finger:0},E3:{string:'D',finger:1},'F#3':{string:'D',finger:3},G3:{string:'D',finger:4},A3:{string:'A',finger:0},B3:{string:'A',finger:1},'C#4':{string:'A',finger:3},D4:{string:'A',finger:4}};
@@ -258,6 +287,7 @@ lessons.forEach(l=>{if(!l.sections.length)l.sections=Array.from({length:Math.cei
 lessons.push((typeof module!=='undefined'&&module.exports?require('./laputa.js'):root.CelloLaputa).lesson);
 lessons.push((typeof module!=='undefined'&&module.exports?require('./advanced.js'):root.CelloAdvanced).lesson);
 lessons.push((typeof module!=='undefined'&&module.exports?require('./scars.js'):root.CelloScars).lesson);
+lessons.push((typeof module!=='undefined'&&module.exports?require('./c-major.js'):root.CelloCMajor).lesson);
 const library={version:3,lessons,planned:[]};
 if(typeof module!=='undefined'&&module.exports)module.exports=library;else root.CelloLibrary=library;
 })(globalThis);
