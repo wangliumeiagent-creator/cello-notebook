@@ -1,8 +1,10 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const {chromium}=require(process.env.PLAYWRIGHT_PATH||'C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const cacheHome=process.env.HOME||process.env.USERPROFILE||'',playwrightCandidates=[process.env.PLAYWRIGHT_PATH,path.join(cacheHome,'.cache','codex-runtimes','codex-primary-runtime','dependencies','node','node_modules','playwright'),'C:/Users/Administrator/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright'].filter(Boolean),playwrightPath=playwrightCandidates.find(fs.existsSync);
+if(!playwrightPath)throw Error('找不到 Playwright；请设置 PLAYWRIGHT_PATH 指向 playwright 包目录。');
+const {chromium}=require(playwrightPath);
 const ROOT=path.resolve(__dirname,'..'),qa=path.join(ROOT,'qa');fs.mkdirSync(qa,{recursive:true});
 (async()=>{
- const browser=await chromium.launch({executablePath:process.env.BROWSER_PATH||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+ const executablePath=process.env.BROWSER_PATH||(process.platform==='win32'?'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe':undefined),browser=await chromium.launch({...(executablePath?{executablePath}:{}),headless:true});
  const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:4317');await page.evaluate(()=>document.fonts.ready);assert.equal(await page.locator('#title').textContent(),'风之歌');assert.equal(await page.locator('#score .score-line').count(),4);
  await page.screenshot({path:path.join(qa,'desktop-practice.png'),fullPage:true});await page.click('#answers');await page.check('[data-layer=jianpu]');await page.screenshot({path:path.join(qa,'desktop-answers.png'),fullPage:true});
@@ -22,6 +24,10 @@ const ROOT=path.resolve(__dirname,'..'),qa=path.join(ROOT,'qa');fs.mkdirSync(qa,
  const second=await browser.newContext();const p2=await second.newPage();await p2.goto('http://127.0.0.1:4317');await p2.click('[data-tab=recordsPanel]');await p2.setInputFiles('#importRecords',backup);assert.equal(await p2.locator('#records .record-entry').count(),1);await second.close();
  await page.click('[data-tab=scorePanel]');await page.click('#hideAnswers');await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);assert.equal(await page.locator('#score .score-line').count(),7);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.screenshot({path:path.join(qa,'mobile.png'),fullPage:true});
  await page.setViewportSize({width:1440,height:1000});await page.waitForTimeout(250);await page.selectOption('#tempo','60');
+ const space=()=>page.evaluate(()=>document.querySelector('#scorePanel').dispatchEvent(new KeyboardEvent('keydown',{code:'Space',bubbles:true,cancelable:true})));
+ await space();await page.waitForTimeout(80);assert.equal(await page.evaluate(()=>CelloApp.playbackState()),'playing');assert.equal(await page.locator('#play').textContent(),'暂停');
+ await space();assert.equal(await page.evaluate(()=>CelloApp.playbackState()),'paused');assert.equal(await page.locator('#play').textContent(),'▶ 继续播放');
+ await space();await page.waitForTimeout(40);assert.equal(await page.evaluate(()=>CelloApp.playbackState()),'playing');await page.click('#stop');
  await page.evaluate(()=>document.querySelector('#printRoot').innerHTML=CelloApp.printHtml());const windPdf=path.join(ROOT,'dist/scores/song-of-the-wind.pdf');if(!fs.existsSync(windPdf))await page.pdf({path:windPdf,preferCSSPageSize:true,printBackground:true});
  let print='';for(const id of ['d-major-up','d-major-down','d-major-return']){await page.goto('http://127.0.0.1:4317/#'+id);await page.evaluate(()=>document.fonts.ready);print+=await page.evaluate(()=>CelloApp.printHtml());}
  await page.evaluate(html=>{window.onbeforeprint=null;document.querySelector('#printRoot').innerHTML=html;},print);

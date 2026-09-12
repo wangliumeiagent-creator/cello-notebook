@@ -5,27 +5,28 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const glyph=(code,x,y)=>`<text class="music" x="${x}" y="${y}">&#x${code};</text>`;
 const text=(str,x,y,cls='annotation',extra='')=>`<text class="${cls}" x="${x}" y="${y}" ${extra}>${esc(str)}</text>`;
 const line=(x,y,xx,yy,w=1)=>`<line x1="${x}" y1="${y}" x2="${xx}" y2="${yy}" stroke="currentColor" stroke-width="${w}"/>`;
+const stringNumber={A:'Ⅰ',D:'Ⅱ',G:'Ⅲ',C:'Ⅳ'};
 function rhythm(beats){const dotted=[.375,.75,1.5,3].includes(beats),base=dotted?beats/1.5:beats;return {dotted,base,type:({.125:'32nd',.25:'16th',.5:'eighth',1:'quarter',2:'half',4:'whole'})[base],flags:base<1?Math.round(Math.log2(1/base)):0};}
 function keyAlter(l,step){const count=l.fifths||0;return count>0?('FCGDAEB'.slice(0,count).includes(step)?1:0):('BEADGCF'.slice(0,-count).includes(step)?-1:0);}
 function degree(l,pitch){if(!pitch)return {text:'0',octave:0};const p=C.pitchInfo(pitch),tonic=C.pitchInfo(l.jianpuTonic||'D3'),delta=p.diatonic-tonic.diatonic,alter=p.alter-keyAlter({fifths:l.jianpuFifths??l.fifths},p.step);return {text:(alter>0?'♯':alter<0?'♭':'')+((delta%7+7)%7+1),octave:Math.floor(delta/7)};}
 const tieCurve=(x,y,xx,yy)=>`<path class="tie" d="M ${x} ${y} C ${x+(xx-x)*.25} ${y-10}, ${x+(xx-x)*.75} ${yy-10}, ${xx} ${yy}" fill="none" stroke="currentColor" stroke-width="1.4"/>`;
 function renderSystem(l,start,count,layers={},selection=null,interactive=true,mobile=false){
- const rows=['names','strings','fingers','jianpu'].filter(r=>layers[r]);const width=mobile?700:1070,left=155,bw=(width-left-15)/(mobile?(l.systemBars?1:2):(l.systemBars||4)),height=(rows.length?196+rows.length*25:layers.bows?185:155)+(l.topPadding||0);
- let s=`<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(l.title)}，第 ${start+1} 至 ${start+count} 小节"><g transform="translate(0,${l.topPadding||0})">`;
+ const showFingering=layers.fingering||layers.strings||layers.fingers,rows=['names','jianpu'].filter(r=>layers[r]),width=mobile?700:1070,left=155,bw=(width-left-15)/(mobile?(l.systemBars?1:2):(l.systemBars||4)),highestNoteY=Math.min(...l.bars.slice(start,start+count).flatMap(bar=>bar.filter(e=>e.pitch).map(e=>C.pitchInfo(e.pitch).y)),72),fingeringY=Math.min(24,highestNoteY-24),hasTempoMark=(l.tempoMarks||[]).some(t=>t.bar>=start+1&&t.bar<=start+count),topGuideY=showFingering&&hasTempoMark?Math.min(0,fingeringY):fingeringY,annotationPadding=showFingering?Math.max(0,12-((l.topPadding||0)+topGuideY)):0,height=(rows.length?196+rows.length*25:layers.bows?185:155)+(l.topPadding||0)+annotationPadding;
+ let s=`<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(l.title)}，第 ${start+1} 至 ${start+count} 小节"><g transform="translate(0,${(l.topPadding||0)+annotationPadding})">`;
  const positions=new Map();
  for(let i=0;i<count;i++){const bi=start+i;if(selection&&bi+1>=selection.from&&bi+1<=selection.to)s+=`<rect class="bar-selection" x="${left+i*bw}" y="43" width="${bw}" height="104" rx="5"/>`;}
  for(let y=72;y<=120;y+=12)s+=line(14,y,left+bw*count,y);
  s+=glyph('E062',22,84);if(l.fifths<=-1)s+=glyph('E260',65,108);if(l.fifths<=-2)s+=glyph('E260',84,90);if(l.fifths>=1)s+=glyph('E262',65,84);if(l.fifths>=2)s+=glyph('E262',84,102);
  s+=text(l.meter[0],115,93,'', 'font-family="Georgia,serif" font-size="29" font-weight="bold"')+text(l.meter[1],115,117,'','font-family="Georgia,serif" font-size="29" font-weight="bold"');
- const rowNames={names:'音名',strings:'弦名',fingers:'指法',jianpu:'简谱 1='+(l.jianpuKey||'D')};rows.forEach((r,i)=>s+=text(rowNames[r],14,191+i*25,'annotation rowlabel'));
+ const rowNames={names:'音名',jianpu:'简谱 1='+(l.jianpuKey||'D')};if(showFingering)s+=text('弦 / 指',14,fingeringY,'annotation rowlabel');rows.forEach((r,i)=>s+=text(rowNames[r],14,191+i*25,'annotation rowlabel'));
  if(start===0&&layers.bows&&l.dynamic)s+=text(l.dynamic,33,156,'annotation','font-style="italic" font-weight="bold"');
  for(let i=0;i<count;i++){
-  const bi=start+i,bar=l.bars[bi],bx=left+i*bw,scale=(bw-40)/l.meter[0];s+=text(C.barLabel(l,bi),bx+7,l.topPadding?-30:14,'bar-number');const tempoMark=(l.tempoMarks||[]).find(t=>t.bar===bi+1);if(tempoMark)s+=text(tempoMark.label,bx+28,l.topPadding?-12:30,'annotation','font-size="11"');let beat=0;
+  const bi=start+i,bar=l.bars[bi],bx=left+i*bw,scale=(bw-40)/l.meter[0];s+=text(C.barLabel(l,bi),bx+7,l.topPadding?-30:14,'bar-number');const tempoMark=(l.tempoMarks||[]).find(t=>t.bar===bi+1);if(tempoMark)s+=text(tempoMark.label,bx+28,showFingering?0:l.topPadding?-12:30,'annotation','font-size="11"');let beat=0;
   const gap=l.minNoteSpacing||0,flex=(bw-40-gap*bar.length)/l.meter[0],accidentals=new Map();const points=bar.map((e,ni)=>{const p={x:bx+25+ni*gap+beat*(gap?flex:scale),y:e.pitch?C.pitchInfo(e.pitch).y:96,beat,event:e};beat+=e.beats;return p;});
   points.forEach((p,n)=>positions.set(`${bi+1}:${n}`,p));
   const beams=new Map(),groups=[];for(let j=0;j<points.length;){const a=j,p=points[j];if(!p.event.pitch||(p.event.writtenBeats||p.event.beats)>=1){j++;continue;}while(j+1<points.length&&points[j+1].event.pitch&&(points[j+1].event.writtenBeats||points[j+1].event.beats)<1&&Math.floor(points[j+1].beat)===Math.floor(p.beat))j++;if(j>a){const y=Math.max(...points.slice(a,j+1).map(p=>p.y))+35;for(let k=a;k<=j;k++)beams.set(k,{y});groups.push({a,z:j,y});}j++;}
   points.forEach(({x,y,event:e},ni)=>{
-   const p=e.pitch?C.pitchInfo(e.pitch):null,id=`${l.id}:${bi}:${ni}`,label=p?`${p.name}，${e.tuplet?"⅔":e.beats} 拍，${e.string} 弦 ${e.finger} 指`:`休止 ${e.tuplet?"⅔":e.beats} 拍`;
+   const p=e.pitch?C.pitchInfo(e.pitch):null,id=`${l.id}:${bi}:${ni}`,label=p?`${p.name}，${e.tuplet?"⅔":e.beats} 拍，${stringNumber[e.string]} 弦 ${e.finger} 指`:`休止 ${e.tuplet?"⅔":e.beats} 拍`;
    s+=`<g class="note-event" data-note="${id}" data-pitch="${esc(e.pitch||'')}" ${interactive?`tabindex="0" role="button" aria-label="${label}"`:''}><title>${label}</title><rect class="note-halo" x="${x-9}" y="44" width="34" height="105" rx="5"/>`;
    const r=rhythm(e.writtenBeats||e.beats);
    if(p){const accidentalKey=p.step+p.octave,previous=accidentals.has(accidentalKey)?accidentals.get(accidentalKey):keyAlter(l,p.step);if(p.alter!==previous&&!['stop','continue'].includes(e.tie))s+=glyph(p.alter===1?'E262':p.alter===-1?'E260':'E261',x-23,y);if(!['stop','continue'].includes(e.tie))accidentals.set(accidentalKey,p.alter);
@@ -38,7 +39,8 @@ function renderSystem(l,start,count,layers={},selection=null,interactive=true,mo
    if(e.articulation==='tenuto')s+=line(x,Math.min(y-15,57),x+12,Math.min(y-15,57),1.5);
    if(layers.bows&&e.expression)s+=text(e.expression,x,155,'annotation','font-style="italic"');
    if(layers.bows&&e.breath)s+=glyph('E4CE',Math.min(x+36,bx+bw-12),55);
-   rows.forEach((row,ri)=>{const yy=191+ri*25,num=degree(l,e.pitch);let value=row==='names'?(p?p.name:'休止'):row==='strings'?(p?e.string:'—'):row==='fingers'?(p?((e.extension?(e.extension==='back'?'1低':'4伸'):e.finger)+(e.position?'·'+e.position:'')):'—'):num.text+(e.beats===4?' — — —':e.beats===3?' — —':e.beats===2?' —':r.dotted?' ·':'');s+=text(value,x-3,yy,'annotation',l.systemBars?'style="font-size:12px"':'');if(row==='jianpu'){for(let k=0;k<r.flags;k++)s+=line(x-3,yy+3+k*3,x+10,yy+3+k*3);for(let k=0;k<Math.abs(num.octave);k++)s+=`<circle cx="${x+2}" cy="${num.octave>0?yy-17-k*5:yy+9+r.flags*3+k*5}" r="1.6" fill="currentColor"/>`;}});
+   if(showFingering){const finger=e.extension?(e.extension==='back'?'1低':'4伸'):e.finger,value=p?`${stringNumber[e.string]}·${finger}${e.position&&e.position!=='I'?'·'+e.position:''}`:'—';s+=text(value,x-4,fingeringY,'annotation fingering-annotation',l.systemBars?'style="font-size:12px"':'');}
+   rows.forEach((row,ri)=>{const yy=191+ri*25,num=degree(l,e.pitch);let value=row==='names'?(p?p.name:'休止'):num.text+(e.beats===4?' — — —':e.beats===3?' — —':e.beats===2?' —':r.dotted?' ·':'');s+=text(value,x-3,yy,'annotation',l.systemBars?'style="font-size:12px"':'');if(row==='jianpu'){for(let k=0;k<r.flags;k++)s+=line(x-3,yy+3+k*3,x+10,yy+3+k*3);for(let k=0;k<Math.abs(num.octave);k++)s+=`<circle cx="${x+2}" cy="${num.octave>0?yy-17-k*5:yy+9+r.flags*3+k*5}" r="1.6" fill="currentColor"/>`;}});
    s+='</g>';
   });
   groups.forEach(({a,z,y})=>{s+=line(points[a].x+.7,y,points[z].x+.7,y,4);for(let level=2;level<=3;level++)for(let n=a;n<=z;n++)if(rhythm(points[n].event.beats).flags>=level){const next=n<z&&rhythm(points[n+1].event.beats).flags>=level,prev=n>a&&rhythm(points[n-1].event.beats).flags>=level,by=y-(level-1)*7;if(next)s+=line(points[n].x+.7,by,points[n+1].x+.7,by,3);else if(!prev)s+=line(points[n].x+.7,by,points[n].x+(n===z?-9:10),by,3);}});
