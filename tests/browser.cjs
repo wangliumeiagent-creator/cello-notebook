@@ -6,7 +6,7 @@ const ROOT=path.resolve(__dirname,'..'),qa=path.join(ROOT,'qa');fs.mkdirSync(qa,
 (async()=>{
  const executablePath=process.env.BROWSER_PATH||(process.platform==='win32'?'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe':undefined),browser=await chromium.launch({...(executablePath?{executablePath}:{}),headless:true});
  const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto('http://127.0.0.1:4317');await page.evaluate(()=>document.fonts.ready);assert.equal(await page.locator('#title').textContent(),'风之歌');assert.equal(await page.locator('#score .score-line').count(),4);
+ await page.goto('http://127.0.0.1:4317');await page.evaluate(()=>document.fonts.ready);assert.equal(await page.locator('#title').textContent(),'风之歌');assert.equal(await page.locator('#score .score-line').count(),4);assert.equal(await page.locator('link[rel=icon]').getAttribute('href'),'cello-icon.svg?v=2');assert.equal(await page.locator('.brand-icon').count(),0);
  await page.screenshot({path:path.join(qa,'desktop-practice.png'),fullPage:true});await page.click('#answers');await page.check('[data-layer=jianpu]');await page.screenshot({path:path.join(qa,'desktop-answers.png'),fullPage:true});
  const glyphs=await page.evaluate(()=>({font:document.fonts.check('48px Bravura'),bars:CelloApp.lesson().bars.length}));assert.equal(glyphs.font,true);assert.equal(glyphs.bars,14);
  await page.selectOption('#from','3');await page.selectOption('#to','6');await page.selectOption('#tempo','20');await page.uncheck('#countIn');await page.check('#repeat');await page.click('#play');await page.waitForTimeout(300);

@@ -9,3 +9,24 @@
 @media(min-width:701px){.sidebar{overflow-y:auto;display:flex;flex-direction:column}.sidebar-foot{position:static;margin-top:auto;padding-top:24px}}
 
 .fingering-annotation{font-weight:700;fill:#315b49}
+
+/* Auxiliary note names and fingering marks use the requested blue. */
+.annotation,.fingering-annotation{fill:rgb(90,169,210)}
+
+/* Primary playback controls remain readable when hovered. */
+#play{color:#fff}
+button.primary:hover,.button.primary:hover{background:var(--green);color:#fff}
+
+/* Updated practice palette: primary green, secondary frequency, and hint color. */
+:root{--green:#5bae1b;--secondary:#b1c06b;--hint:#de785e;--accent:#de785e}
+button:hover,.button:hover{background:#eef4e8}
+.nav-link.active{background:#e4eedb;color:#3f7415}
+.nav-link:hover{background:#eef4e8}
+.chip{background:#eef4e8}
+.secondary input[type=checkbox]{accent-color:var(--secondary)}
+.phrases button{border-color:var(--secondary)}
+.unit{color:#718044}
+.score-line.playing{background:#f1f6e7}
+.bar-selection{fill:#e4eedb}
+.theory-task{border-left-color:var(--hint);background:#fff0eb}
+.note-event:hover .note-halo{fill:#eef4e8}

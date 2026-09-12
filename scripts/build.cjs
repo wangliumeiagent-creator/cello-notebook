@@ -9,4 +9,5 @@ const html=src('index.html').replace('__CSS__',src('styles.css').replace('__FONT
 fs.writeFileSync(path.join(out,'index.html'),html);
 for(const lesson of lib.lessons)for(const answer of [false,true])fs.writeFileSync(path.join(out,'scores',lesson.id+(answer?'-answers':'-practice')+'.musicxml'),notation.musicxml(lesson,answer));
 fs.copyFileSync(path.join(ROOT,'assets','Bravura-LICENSE.txt'),path.join(out,'Bravura-LICENSE.txt'));
+fs.copyFileSync(path.join(ROOT,'assets','cello-icon.svg'),path.join(out,'cello-icon.svg'));
 console.log(`Built ${lib.lessons.length} lessons into ${out}`);
