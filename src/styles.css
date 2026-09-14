@@ -30,3 +30,22 @@ button:hover,.button:hover{background:#eef4e8}
 .bar-selection{fill:#e4eedb}
 .theory-task{border-left-color:var(--hint);background:#fff0eb}
 .note-event:hover .note-halo{fill:#eef4e8}
+
+/* Group the lesson navigation around the teacher-led learning path. */
+.library-group{margin:8px 0}
+.library-group-title{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;border-radius:7px;padding:7px 10px;color:var(--muted);font-size:13px;font-weight:600;list-style:none}
+.library-group-title::-webkit-details-marker{display:none}
+.library-group-title::before{content:'›';display:inline-block;width:12px;color:var(--green);font-size:18px;line-height:1;transform:rotate(0deg);transition:transform .15s ease}
+.library-group[open]>.library-group-title::before{transform:rotate(90deg)}
+.library-group-title:hover{background:#e2e9dc;color:var(--ink)}
+.nav-count{min-width:20px;padding:0 6px;border-radius:10px;background:#e3eadf;text-align:center;font-size:11px;font-weight:400}
+.library-group-links{margin:2px 0 8px 10px}
+.library-group-links .nav-link{padding-top:7px;padding-bottom:7px}
+
+@media(max-width:700px){
+ .sidebar nav{display:block;overflow:visible;padding-top:8px}
+ .library-group{margin:4px 0}
+ .library-group-title{padding:6px 8px}
+ .library-group-links{margin-left:8px}
+ .library-group-links .nav-link{white-space:normal;padding:6px 9px}
+}
