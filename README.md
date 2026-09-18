@@ -43,6 +43,21 @@ Windows、Mac、iPhone 在浏览器打开同一个网站地址。iPhone 可在 S
 
 记录只保存在当前设备和当前浏览器，不自动跨设备同步。换电脑时，在“练习记录”导出 JSON，再在另一台电脑导入。从本地文件 / localhost 改到 GitHub 网址，也需要先导出再导入。保留原备份；关闭隐私浏览或清除网站数据可能使本地记录不可用。
 
+## 首页与指板探索
+
+不带曲目 hash 的网址显示首页，可选择“练习曲”或“指板探索”；原有曲目链接（例如 `#song-of-the-wind`）仍会直接打开对应练习。指板探索显示 C、G、D、A 四根弦（Ⅳ、Ⅲ、Ⅱ、Ⅰ），可分别点选空弦或当前把位的四个手指落点。所选音会同步显示固定唱名、频率、弦号、把位 / 指法与低音谱号位置；试听为约 0.7 秒的 Web Audio 合成参考音，可静音或重播。
+
+第一版使用一个不含伸张或半把位的常规四指“全－半－全”手型。把位名称刻意细分，避免把半音格笼统称作把位：
+
+| 选择项 | 1 指相对开弦 | 1–4 指半音偏移 |
+| --- | ---: | --- |
+| 第一把位 | 2 | 2、4、5、7 |
+| 下第二把位 | 3 | 3、5、6、8 |
+| 下第三把位 | 5 | 5、7、8、10 |
+| 下第四把位 | 7 | 7、9、10、12 |
+
+位置名称的依据为 [The Cello Lab：Cello positions](https://cellolabstudio.com/en/2023/12/13/cello-positions-notes/)，该资料明确说明第二、第三把位有下 / 上的细分，并将第四把位说明为下第四的常见用法。表中音高以开弦 MIDI 加半音偏移计算；所有条目为“来源已核对；待老师审核”，不能替代个人老师对手型、音准和换把的确认。指板比例仅便于点击，不是实际手指距离尺。
+
 ## 跨电脑继续编辑
 
 从新电脑接手请先读 [项目交接](docs/HANDOFF.md)，再按 [Windows / Mac 开发与发布](docs/DEVELOPMENT.md) 配置。AI 协作约定放在 [AGENTS.md](AGENTS.md)，随 Git 一起同步。
@@ -66,6 +81,7 @@ npm start
 - `src/c-major.js`：C 大调一八度音阶，C / G 弦第一把位。
 - `src/core.js`：拍数校验、音高、播放时间线、备份合并。
 - `src/notation.js`：SVG 和 MusicXML 4.0 生成器。
+- `src/fingerboard.js`：开弦、下第二/下第三/下第四把位的教学示意数据与独立音高校验。
 - `src/app.js`：播放、辅助、打印、记录交互。
 - `scripts/build.cjs`：生成独立 HTML 与 MusicXML，不联网。会更新同名生成文件，不删除额外文件。
 - `scripts/serve.cjs`：本地服务器，仅绑定 127.0.0.1。
@@ -83,6 +99,7 @@ PDF 为预生成文件；修改谱面后用页面“打印 / PDF”更新相应 
 ```sh
 python scripts/validate_xml.py
 node tests/browser.cjs
+node tests/fingerboard-browser.cjs
 node tests/smoke_extra.cjs
 node tests/laputa-browser.cjs --pdf
 node tests/advanced-browser.cjs --pdf

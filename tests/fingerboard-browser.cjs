@@ -1,0 +1,27 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const playwrightPath=process.env.PLAYWRIGHT_PATH;
+if(!playwrightPath||!fs.existsSync(playwrightPath))throw Error('请设置 PLAYWRIGHT_PATH 指向 playwright 包目录。');
+const {chromium}=require(playwrightPath);
+(async()=>{
+ const browser=await chromium.launch({headless:true,...(process.env.BROWSER_PATH?{executablePath:process.env.BROWSER_PATH}:{})});
+ try{
+  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.addInitScript(()=>{
+   window.__fingerboardTones=[];window.__rejectFingerboardAudio=false;
+   window.AudioContext=class{constructor(){this.state='suspended';this.currentTime=0;this.destination={};}resume(){if(window.__rejectFingerboardAudio)return Promise.reject(Error('rejected'));this.state='running';return Promise.resolve();}createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){}},connect(){},disconnect(){}};}createOscillator(){const osc={frequency:{value:0},connect(){},disconnect(){},start(){window.__fingerboardTones.push(osc.frequency.value);},stop(){queueMicrotask(()=>osc.onended?.());}};return osc;}};
+  });
+  await page.goto('http://127.0.0.1:4317');assert.equal(await page.evaluate(()=>CelloApp.view()),'home');assert.equal(await page.locator('.sidebar').isVisible(),false);assert.equal(await page.locator('.home-card').count(),2);console.log('home ok');
+  await page.click('a[href="#practice"]');await page.waitForFunction(()=>CelloApp.view()==='lesson');assert.equal(await page.locator('#title').textContent(),'风之歌');
+  await page.goto('http://127.0.0.1:4317/#d-major-up');await page.waitForFunction(()=>CelloApp.lesson().id==='d-major-up');assert.equal(await page.evaluate(()=>CelloApp.view()),'lesson');
+  await page.goBack();await page.waitForFunction(()=>CelloApp.view()==='lesson');assert.equal(await page.evaluate(()=>CelloApp.lesson().id),'song-of-the-wind');
+  await page.goto('http://127.0.0.1:4317/#fingerboard');await page.waitForFunction(()=>CelloApp.view()==='fingerboard');assert.equal(await page.locator('.sidebar').isVisible(),false);assert.equal(await page.locator('[data-position]').count(),4);assert.equal(await page.locator('[data-finger-string]').count(),16);const pointBoxes=await page.locator('[data-finger-string="C"]').evaluateAll(elements=>elements.map(element=>{const rect=element.getBoundingClientRect();return {finger:Number(element.dataset.finger),top:rect.top,bottom:rect.bottom};}).sort((a,b)=>a.top-b.top));assert.deepEqual(pointBoxes.map(box=>box.finger),[1,2,3,4]);assert.ok(pointBoxes.every((box,index)=>index===0||box.top>=pointBoxes[index-1].bottom));console.log('routes ok');
+  await page.click('[data-finger-string="A"][data-finger="2"]');await page.waitForFunction(()=>CelloApp.fingerboardSelection()?.pitch==='C#4');assert.match(await page.locator('#fingerboardInfo').textContent(),/固定唱名/);assert.match(await page.locator('#fingerboardStaff').textContent(),/C♯4/);assert.equal(await page.locator('#fingerboardStaff .music').count(),3);
+  await page.evaluate(()=>{const points=[...document.querySelectorAll('[data-finger-string="D"]')];points[0].click();points[3].click();});await page.waitForTimeout(30);assert.equal(await page.evaluate(()=>window.__fingerboardTones.length),2);assert.equal(await page.evaluate(()=>CelloApp.fingerboardSelection().finger),4);assert.equal(await page.evaluate(()=>window.__fingerboardTones.at(-1)),await page.evaluate(()=>CelloApp.fingerboardSelection().hz));
+  await page.click('[data-position="third"]');assert.equal(await page.evaluate(()=>CelloApp.fingerboardSelection()),null);assert.match(await page.locator('#fingerboardStatus').textContent(),/不会自动发声/);console.log('selection ok');
+  await page.click('[data-open-string="C"]');assert.match(await page.locator('#fingerboardInfo').textContent(),/空弦 \/ 0 指/);assert.equal(await page.evaluate(()=>CelloApp.fingerboardSelection().pitch),'C2');
+  await page.click('#fingerboardMute');await page.click('[data-finger-string="G"][data-finger="1"]');assert.match(await page.locator('#fingerboardStatus').textContent(),/静音/);await page.click('#fingerboardMute');await page.evaluate(()=>{window.__rejectFingerboardAudio=true;window.dispatchEvent(new Event('pagehide'));});await page.click('#fingerboardReplay');await page.waitForFunction(()=>document.querySelector('#fingerboardStatus').textContent.includes('未能启动'));await page.evaluate(()=>window.__rejectFingerboardAudio=false);await page.click('#fingerboardReplay');await page.waitForTimeout(30);assert.match(await page.locator('#fingerboardStatus').textContent(),/参考音/);
+  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(150);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);console.log('audio and mobile ok');
+  await page.screenshot({path:path.join(__dirname,'..','qa','fingerboard-mobile.png'),fullPage:true});await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:path.join(__dirname,'..','qa','fingerboard-desktop.png'),fullPage:true});
+  assert.deepEqual(errors,[]);console.log('Fingerboard browser checks passed: routing, four positions, selection/audio retry, and 390px layout.');await context.close();
+ }finally{await browser.close();}
+})().catch(error=>{console.error(error);process.exit(1)});

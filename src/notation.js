@@ -58,6 +58,18 @@ function renderSystem(l,start,count,layers={},selection=null,interactive=true,mo
  for(const slur of l.slurs||[]){const [fb,fn]=slur.from,[tb,tn]=slur.to;if(tb<start+1||fb>start+count)continue;const a=positions.get(`${fb}:${fn}`),z=positions.get(`${tb}:${tn}`),x=a?a.x+6:left,xx=z?z.x+6:left+bw*count,below=slur.placement==='below',y=(a||z).y+(below?44:-15),yy=(z||a).y+(below?44:-15),peak=below?Math.max(y,yy)+20:Math.min(y,yy)-24;s+=`<path class="slur" d="M ${x} ${y} C ${x+(xx-x)*.25} ${peak}, ${x+(xx-x)*.75} ${peak}, ${xx} ${yy}" fill="none" stroke="currentColor" stroke-width="1.2"/>`;}
  return s+'</g></svg>';
 }
+function renderSingleNote(pitch,label=''){
+ const p=C.pitchInfo(pitch),width=330,height=190,x=164,y=p.y;
+ let s=`<svg class="single-note-staff" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(label||p.name)}"><title>${esc(label||p.name)}</title>`;
+ for(let lineY=72;lineY<=120;lineY+=12)s+=line(18,lineY,width-18,lineY);
+ s+=glyph('E062',27,84);
+ for(let ledger=60;ledger>=y;ledger-=12)s+=line(x-8,ledger,x+19,ledger);
+ for(let ledger=132;ledger<=y;ledger+=12)s+=line(x-8,ledger,x+19,ledger);
+ if(p.alter)s+=glyph(p.alter===1?'E262':p.alter===-1?'E260':'E261',x-27,y);
+ s+=glyph('E0A4',x,y)+line(x+.7,y,x+.7,y+35,1.4);
+ s+=text(p.name,x-18,164,'annotation');
+ return s+'</svg>';
+}
 function musicxml(l,answers=false,tempo=l.tempo){
  C.validateLesson(l);const divisions=l.divisions||8;const bars=l.bars.map((bar,i)=>{
   let inner=i%(l.systemBars||4)===0?`<print${i?' new-system="yes"':''}/>`:'';
@@ -84,5 +96,5 @@ function musicxml(l,answers=false,tempo=l.tempo){
  }).join('');
  return `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><work><work-title>${esc(l.title)}${answers?' - Answers':''}</work-title></work><identification><creator type="composer">${esc(l.composer||(l.kind==='曲目'?'Folk song':'Original scale exercise'))}</creator></identification><defaults><scaling><millimeters>7</millimeters><tenths>40</tenths></scaling></defaults><part-list><score-part id="P1"><part-name>Violoncello</part-name><score-instrument id="I1"><instrument-name>Violoncello</instrument-name></score-instrument><midi-instrument id="I1"><midi-channel>1</midi-channel><midi-program>43</midi-program></midi-instrument></score-part></part-list><part id="P1">${bars}</part></score-partwise>`;
 }
-const api={renderSystem,musicxml,esc,rhythm,degree};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.CelloNotation=api;
+const api={renderSystem,renderSingleNote,musicxml,esc,rhythm,degree};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.CelloNotation=api;
 })(globalThis);
