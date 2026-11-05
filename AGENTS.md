@@ -18,3 +18,5 @@
 - 浏览器检查使用 `PLAYWRIGHT_PATH`、`BROWSER_PATH`，不要复制旧电脑的绝对路径到新代码。
 - main 保存源码，gh-pages 只发布 dist。发布步骤与失败处理见开发文档。
 - 提交前检查生成产物和文档一致；不要将“构建通过”当作 PDF 已更新或网站已部署。
+
+- 修改曲目或通用功能前必读 [双端开发规范](docs/CROSS_PLATFORM_DEVELOPMENT.md)，评估网页版与独立小程序是否同步，并明确记录双方结论。
