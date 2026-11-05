@@ -64,6 +64,8 @@ Windows、Mac、iPhone 在浏览器打开同一个网站地址。iPhone 可在 S
 
 修改 `src/sight-reading.html` 后运行构建，生成 `dist/sight-reading.html`，与首页一同发布。
 
+短句按每小节一根弦安排相邻换弦，再在弦内选音。双弦范围每次覆盖两根弦，四弦及空弦范围每次覆盖四根弦；页面会列出本段使用的琴弦。
+
 ## 跨电脑继续编辑
 
 从新电脑接手请先读 [项目交接](docs/HANDOFF.md)，再按 [Windows / Mac 开发与发布](docs/DEVELOPMENT.md) 配置。AI 协作约定放在 [AGENTS.md](AGENTS.md)，随 Git 一起同步。
