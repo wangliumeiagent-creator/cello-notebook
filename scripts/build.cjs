@@ -8,6 +8,10 @@ const font=fs.readFileSync(path.join(ROOT,'assets','Bravura.otf')).toString('bas
 const html=src('index.html').replace('__CSS__',src('styles.css').replace('__FONT__',font)).replace('__LAPUTA__',src('laputa.js')).replace('__ADVANCED__',src('advanced.js')).replace('__SCARS__',src('scars.js')+src('c-major.js')).replace('__LIBRARY__',src('library.js')).replace('__CORE__',src('core.js')).replace('__NOTATION__',src('notation.js')).replace('__FINGERBOARD__',src('fingerboard.js')).replace('__APP__',src('app.js'));
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.writeFileSync(path.join(out,'sight-reading.html'),src('sight-reading.html'));
+// Keep the game tied to the same score data; emit a self-contained local demo.
+const game=src('game-demo.html').replace(/<script src="([\w-]+\.js)"><\/script>/g,(_,name)=>'<script>'+src(name).replace(/<\/script/gi,'<\\/script')+'</script>');
+fs.writeFileSync(path.join(out,'game-demo.html'),game);
+fs.writeFileSync(path.join(out,'game.html'),game);
 for(const lesson of lib.lessons)for(const answer of [false,true])fs.writeFileSync(path.join(out,'scores',lesson.id+(answer?'-answers':'-practice')+'.musicxml'),notation.musicxml(lesson,answer));
 fs.copyFileSync(path.join(ROOT,'assets','Bravura-LICENSE.txt'),path.join(out,'Bravura-LICENSE.txt'));
 fs.copyFileSync(path.join(ROOT,'assets','cello-icon.svg'),path.join(out,'cello-icon.svg'));
