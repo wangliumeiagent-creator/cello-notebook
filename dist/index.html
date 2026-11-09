@@ -53,9 +53,225 @@ button:hover,.button:hover{background:#eef4e8}
  .library-group-links .nav-link{white-space:normal;padding:6px 9px}
  .home-view{padding-top:20px}.home-cards{grid-template-columns:1fr}.fingerboard-layout{grid-template-columns:1fr}.fingerboard-strings{min-height:500px;gap:6px;padding-inline:3px}.fingerboard-string{min-height:460px}.finger-point{width:66px;min-height:46px;font-size:11px}.finger-point strong{font-size:18px}.finger-point span{font-size:10px}.position-zone{width:44px}.fingerboard-card{padding:15px 8px}.position-controls button{padding:7px 9px;font-size:13px}
 }
+
+/* Standalone metronome */
+body.metronome-mode {
+  color-scheme: dark;
+  background: radial-gradient(ellipse at 50% 38%, #1c2a4c, #101526 55%);
+  color: #f1f5ff;
+}
+.metronome-mode main { padding: 0 16px; }
+#metronomeView {
+  --metro-line: #4b6089;
+  --metro-cyan: #6ee4ff;
+  width: min(100%, 460px);
+  margin: auto;
+  padding: max(16px, env(safe-area-inset-top)) 0 max(16px, env(safe-area-inset-bottom));
+  text-align: center;
+}
+.metro-header { position: relative; margin-bottom: 16px; }
+.metro-header h1 { margin: 0; font-size: 23px; line-height: 44px; font-weight: 600; }
+.metro-header a {
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #c4d1ee;
+  text-decoration: none;
+  font-size: 26px;
+}
+.metro-header a:hover { background: #273653; }
+#metroSettings {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  width: 100%;
+  padding: 0;
+  border-radius: 30px;
+  border-color: var(--metro-line);
+  background: #1c2844;
+  color: #e3ebff;
+}
+#metroSettings:hover { background: #28395b; }
+#metroSettings span { line-height: 46px; }
+#metroSettings > span + span { border-left: 1px solid #394968; }
+.metro-dial {
+  container-type: inline-size;
+  width: min(100%, 388px, max(236px, 52svh));
+  aspect-ratio: 1;
+  margin: clamp(24px, 6vh, 60px) auto 22px;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(from 15deg, #67e1ff, #63599a 25%, #65e1ff 54%, #56548e 76%, #67e1ff);
+  box-shadow: 0 0 44px #377bcc55, inset 0 0 12px #edfaff90;
+}
+.metro-dial::before {
+  content: '';
+  position: absolute;
+  inset: 2.8%;
+  border: 1px solid #2c3954;
+  border-radius: 50%;
+  background: #121827;
+  box-shadow: inset 0 0 0 6px #0c101b;
+}
+.metro-dial::after {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -.3deg, #77dfff 0deg .62deg, #142535 .7deg 3deg);
+}
+.metro-face {
+  z-index: 1;
+  width: 66%;
+  aspect-ratio: 1;
+  border: 1px solid #586588;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  background: linear-gradient(165deg, #414b70, #1a2138 72%);
+  box-shadow: 0 0 0 6px #101626, inset 0 0 0 4px #323b58;
+}
+.metro-face label { color: #c4d1ee; font-size: 13px; letter-spacing: .16em; }
+.metro-tempo { display: flex; align-items: center; justify-content: center; }
+.metro-tempo button {
+  width: clamp(36px, 13cqw, 44px);
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border-color: #627092;
+  background: #35425f;
+  color: #fff;
+  font-size: 23px;
+  line-height: 1;
+}
+.metro-tempo button:hover { background: #4b5e82; }
+#metroTempo {
+  width: 2.12em;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  text-align: center;
+  font-size: clamp(30px, 14cqw, 56px);
+  line-height: 1.3;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.metro-beats { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 27px; }
+.metro-beats span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  min-width: 0;
+  aspect-ratio: 1;
+  border: 1px solid var(--metro-line);
+  border-radius: 50%;
+  background: #202c48;
+  color: #c5d1eb;
+  font-size: 11px;
+}
+.metro-beats span:first-child { border-color: #8e7c60; color: #ffd28c; }
+.metro-beats .is-current { background: var(--metro-cyan); border-color: var(--metro-cyan); color: #101526; }
+.metro-beats .is-current:first-child { background: #ffc371; border-color: #ffc371; color: #241509; }
+.metro-controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  margin: clamp(16px, 4vh, 34px) auto 0;
+  max-width: 360px;
+}
+#metroPlay {
+  width: 84px;
+  height: 84px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  background: linear-gradient(140deg, #ffb05a, #ff7547 60%, #f1513f);
+  color: #231011;
+  font-weight: 700;
+  line-height: 1.2;
+}
+#metroPlay:hover { background: #ffab65; }
+#metroPlayIcon { font-size: 27px; }
+.metro-quick {
+  min-height: 44px;
+  border-radius: 24px;
+  border-color: var(--metro-line);
+  background: #1c2844;
+  color: #e3ebff;
+}
+.metro-quick:hover { background: #28395b; }
+.metro-quick small { font-size: 10px; }
+#metroStatus { min-height: 20px; font-size: 13px; color: #c4d1ee; }
+#metroSheet {
+  position: fixed;
+  inset: auto 0 0;
+  margin: 0 auto;
+  width: min(100%, 540px);
+  max-width: none;
+  max-height: 90vh;
+  padding: 0 0 max(12px, env(safe-area-inset-bottom));
+  border: 1px solid var(--metro-line);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  background: #243552;
+  color: #f1f5ff;
+  text-align: left;
+  box-shadow: 0 -12px 48px #0a101c66;
+}
+#metroSheet::backdrop { background: #050811b8; }
+.metro-sheet-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--metro-line);
+}
+.metro-sheet-header h2 { margin: 0; }
+.metro-sheet-header button { justify-self: start; min-height: 44px; border: 0; background: none; color: #c4d1ee; }
+.metro-sheet-header button:last-child { justify-self: end; color: var(--metro-cyan); font-weight: 700; }
+.metro-sheet-header button:hover { background: #394b6b; }
+#metroSheet fieldset { margin: 17px 16px; padding: 0; border: 0; min-width: 0; }
+#metroSheet legend { padding: 0 0 9px; font-weight: 600; }
+.metro-options { display: flex; flex-wrap: wrap; gap: 7px; }
+.metro-options button, .metro-options label > span {
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid var(--metro-line);
+  border-radius: 9px;
+  color: #ecf3ff;
+  background: #304463;
+  text-align: center;
+}
+.metro-options button:hover, .metro-options label:hover > span { background: #3a5378; }
+.metro-options button[aria-pressed=true], .metro-options input:checked + span {
+  border-color: var(--metro-cyan);
+  color: var(--metro-cyan);
+  background: #1f4259;
+}
+.metro-custom { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; }
+.metro-custom select { min-height: 44px; border-color: var(--metro-line); background: #304463; color: #ecf3ff; }
+#metroBeatUnit { font-size: 13px; color: #c4d1ee; }
+.metro-divisions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.metro-divisions label { position: relative; cursor: pointer; }
+.metro-divisions input { position: absolute; opacity: 0; }
+.metro-divisions input:focus-visible + span { outline: 3px solid #ffc371; outline-offset: 2px; }
+.metro-divisions label > span { display: block; font-size: 12px; padding-inline: 2px; }
+.metro-divisions b { display: block; font-size: 20px; font-weight: 400; }
+@media (min-width: 701px) {
+  .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 </style></head><body>
 <div class="app-shell"><aside class="sidebar"><a class="brand" href="#home"><span>大提琴练习册<small>第一册 · 拓展曲目</small></span></a><nav id="library" aria-label="练习目录"></nav><div class="sidebar-foot">配合纸质教材与老师的课程<br><span>第一阶段 · 0.4</span></div></aside>
-<main><section id="homeView" class="home-view" aria-labelledby="homeTitle"><div class="eyebrow">大提琴学习伴侣</div><h1 id="homeTitle">今天，从哪里开始？</h1><p class="home-intro">曲目练习与指板探索是两个并列入口；选择其一即可开始。</p><div class="home-cards"><a class="home-card" href="#practice"><span class="home-icon" aria-hidden="true">♫</span><h2>练习曲</h2><p>看谱、听示范、按曲练习。</p><span>进入练习曲 →</span></a><a class="home-card" href="#fingerboard"><span class="home-icon" aria-hidden="true">⌁</span><h2>指板探索</h2><p>认识四弦、把位、音高与谱位。</p><span>进入指板探索 →</span></a></div><p class="muted">试听为合成参考音；具体换把与手型请继续以老师建议为准。</p></section>
+<main><section id="homeView" class="home-view" aria-labelledby="homeTitle"><div class="eyebrow">大提琴学习伴侣</div><h1 id="homeTitle">今天，从哪里开始？</h1><p class="home-intro">选择一项，开始今天的练习。</p><div class="home-cards"><a class="home-card" href="#practice"><span class="home-icon" aria-hidden="true">♫</span><h2>练习曲</h2><p>看谱、听示范、按曲练习。</p><span>进入练习曲 →</span></a><a class="home-card" href="#fingerboard"><span class="home-icon" aria-hidden="true">⌁</span><h2>指板探索</h2><p>认识四弦、把位、音高与谱位。</p><span>进入指板探索 →</span></a><a class="home-card" href="#metronome"><span class="home-icon" aria-hidden="true">♩</span><h2>节拍器</h2><p>设定速度和拍号，按自己的节奏练琴。</p><span>进入节拍器 →</span></a></div><p class="muted">试听为合成参考音；具体换把与手型请继续以老师建议为准。</p></section>
 <section id="lessonView" hidden><header class="lesson-header"><div><a class="back-home" href="#home">← 返回首页</a><div class="eyebrow" id="lessonKind"></div><h1 id="title"></h1><p id="description"></p></div><div class="header-actions"><button id="print">打印 / PDF</button></div></header>
 <div class="chips" id="chips"></div>
 <section class="player card" aria-label="播放控制"><div class="control-row"><button id="play" class="primary" aria-keyshortcuts="Space">▶ 播放</button><button id="stop">停止</button><label>速度 <select id="tempo" aria-label="速度"></select><span class="unit">拍/分钟</span></label><span class="separator"></span><label>小节 <select id="from" aria-label="起始小节"></select> 至 <select id="to" aria-label="结束小节"></select></label><button id="whole">全曲</button></div><div class="control-row secondary"><label>播放内容 <select id="playbackMode" aria-label="播放内容"><option value="music">音乐 + 节拍</option><option value="beats">仅节拍</option></select></label><label><input type="checkbox" id="countIn" checked>预备拍</label><label><input type="checkbox" id="metronome">节拍声</label><label><input type="checkbox" id="followScore" checked>播放时自动跟谱</label><label><input type="checkbox" id="loop">循环所选小节</label><label id="repeatLabel"><input type="checkbox" id="repeat" checked>按谱反复（仅全曲）</label></div><p id="playerStatus" role="status" aria-live="polite">先读谱、拍节奏，再播放核对；读谱页按空格可播放或暂停。</p><div class="progress-track"><div id="progress"></div></div></section>
@@ -65,6 +281,66 @@ button:hover,.button:hover{background:#eef4e8}
 <section id="recordsPanel" role="tabpanel" hidden><div class="card"><h2>记下一件值得下次注意的事</h2><p class="muted">记录只保存在当前浏览器。换到另一台电脑时，导出备份，再导入；不会自动上传。</p><form id="recordForm"><div class="control-row"><label>日期 <input id="recordDate" type="date" required></label><label>练习速度 <input id="recordTempo" type="number" min="20" max="160" value="60" required></label><label>状态 <select id="recordStatus"><option>练习中</option><option>较稳定</option><option>需要复习</option></select></label></div><label class="note-label" for="recordNote">易错小节 / 老师提醒 / 下次目标</label><textarea id="recordNote" maxlength="5000" rows="3" placeholder="例如：第 3 小节先读 B–G–D–B，换弦前不要急。"></textarea><button class="primary" type="submit">保存本次记录</button></form><p id="recordMessage" role="status"></p></div><div class="backup-row"><button id="exportRecords">导出全部记录</button><label class="button" for="importRecords">导入记录备份</label><input id="importRecords" type="file" accept=".json,application/json" hidden><span>重复记录跳过，冲突保留两份。</span></div><div id="records"></div></section>
 <footer>低音谱号 · 按自己的节奏练习</footer></section>
 <section id="fingerboardView" hidden aria-labelledby="fingerboardTitle"><header class="lesson-header"><div><a class="back-home" href="#home">← 返回首页</a><div class="eyebrow">指板探索 · 教学示意</div><h1 id="fingerboardTitle">四弦与四把位</h1><p>固定唱名；指板仅为便于点击的示意比例，不表示实际手指距离。</p></div></header><div class="position-controls" role="group" aria-label="选择把位"><button data-position="first" aria-pressed="true">第一把位</button><button data-position="second" aria-pressed="false">下第二把位</button><button data-position="third" aria-pressed="false">下第三把位</button><button data-position="fourth" aria-pressed="false">下第四把位</button></div><p class="muted" id="positionDescription"></p><div class="fingerboard-layout"><section class="card fingerboard-card" aria-label="大提琴四弦指板"><div id="fingerboardStrings" class="fingerboard-strings"></div></section><aside class="fingerboard-detail"><section class="card"><h2>所选音</h2><div id="fingerboardInfo" class="fingerboard-info" aria-live="polite">选择空弦或当前把位的一个落点。</div><div class="fingerboard-actions"><button id="fingerboardReplay" disabled>重播参考音</button><button id="fingerboardMute" aria-pressed="false">声音：开</button></div><p id="fingerboardStatus" role="status" aria-live="polite" class="muted">切换把位不会自动发声。</p></section><section class="card"><h2>低音谱号位置</h2><div id="fingerboardStaff"></div></section></aside></div><section class="card source-card"><h2>数据说明</h2><p id="fingerboardSource"></p></section></section>
+<section id="metronomeView" hidden aria-labelledby="metroTitle">
+  <header class="metro-header">
+    <a href="#home" aria-label="返回首页">←</a>
+    <h1 id="metroTitle">节拍器</h1>
+  </header>
+  <button type="button" id="metroSettings" aria-haspopup="dialog">
+    <span id="metroMeter">4/4</span><span id="metroDivision">每拍 1 下</span><span>设置 <span aria-hidden="true">⌄</span></span>
+  </button>
+  <div class="metro-dial">
+    <div class="metro-face">
+      <label for="metroTempo">BPM</label>
+      <div class="metro-tempo">
+        <button type="button" id="metroSlower" aria-label="降低 1 BPM">−</button>
+        <input id="metroTempo" type="text" inputmode="numeric" maxlength="3" value="60" aria-label="速度，20 至 240 BPM">
+        <button type="button" id="metroFaster" aria-label="提高 1 BPM">+</button>
+      </div>
+    </div>
+  </div>
+  <div id="metroBeats" class="metro-beats" aria-hidden="true"></div>
+  <div class="metro-controls">
+    <button type="button" class="metro-quick" data-metro-tempo="20">20 <small>BPM</small></button>
+    <button type="button" id="metroPlay"><span id="metroPlayIcon" aria-hidden="true">▶</span><span id="metroPlayLabel">开始</span></button>
+    <button type="button" class="metro-quick" data-metro-tempo="30">30 <small>BPM</small></button>
+  </div>
+  <p id="metroStatus" role="status"></p>
+  <dialog id="metroSheet" aria-labelledby="metroSheetTitle">
+    <form id="metroForm">
+      <header class="metro-sheet-header">
+        <button type="button" id="metroCancel">取消</button>
+        <h2 id="metroSheetTitle">节拍设置</h2>
+        <button type="submit">确定</button>
+      </header>
+      <fieldset>
+        <legend>拍号</legend>
+        <div class="metro-options" id="metroPresets">
+          <button type="button" data-meter="2/4">2/4</button>
+          <button type="button" data-meter="3/4">3/4</button>
+          <button type="button" data-meter="4/4">4/4</button>
+          <button type="button" data-meter="5/4">5/4</button>
+          <button type="button" data-meter="6/8">6/8</button>
+        </div>
+        <div class="metro-custom">
+          <label>分子 <select id="metroNumerator"></select></label>
+          <span aria-hidden="true">/</span>
+          <label>分母 <select id="metroDenominator"></select></label>
+        </div>
+        <p id="metroBeatUnit"></p>
+      </fieldset>
+      <fieldset>
+        <legend>拍内细分</legend>
+        <div class="metro-options metro-divisions">
+          <label><input type="radio" name="metroSubdivision" value="1"><span><b aria-hidden="true">♩</b>每拍 1 下</span></label>
+          <label><input type="radio" name="metroSubdivision" value="2"><span><b aria-hidden="true">♫</b>每拍 2 下</span></label>
+          <label><input type="radio" name="metroSubdivision" value="3"><span><b aria-hidden="true">♪♪♪</b>每拍 3 下</span></label>
+          <label><input type="radio" name="metroSubdivision" value="4"><span><b aria-hidden="true">♬♬</b>每拍 4 下</span></label>
+        </div>
+      </fieldset>
+    </form>
+  </dialog>
+</section>
 </main></div><div id="printRoot"></div><script>(function(root){
 'use strict';
 // Transcribed from the three score images supplied by the user.
@@ -529,6 +805,234 @@ function validateData(data=allEnabledNotes()){
 const api={OPEN_STRINGS,POSITIONS,SOURCE,pitchForMidi,openString,position,noteAt,positionNotes,allEnabledNotes,validateData};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.CelloFingerboard=api;
 })(globalThis);
+</script><script>function createMetronome({audioReady, context, tone}) {
+  const view = document.getElementById('metronomeView');
+  const find = selector => view.querySelector(selector);
+  const tempo = find('#metroTempo');
+  const sheet = find('#metroSheet');
+  const settingsButton = find('#metroSettings');
+  const numerator = find('#metroNumerator');
+  const denominator = find('#metroDenominator');
+  const presets = [...view.querySelectorAll('[data-meter]')];
+  const beats = find('#metroBeats');
+  const status = find('#metroStatus');
+  const storageKey = 'cello-notebook-metronome-v1';
+  const denominators = [2, 4, 8, 16];
+  const subdivisions = [1, 2, 3, 4];
+  let settings = { bpm: 60, numerator: 4, denominator: 4, subdivision: 1 };
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey));
+    if (saved && Number.isInteger(saved.bpm) && saved.bpm >= 20 && saved.bpm <= 240
+      && Number.isInteger(saved.numerator) && saved.numerator >= 1 && saved.numerator <= 12
+      && denominators.includes(saved.denominator) && subdivisions.includes(saved.subdivision)) {
+      settings = saved;
+    }
+  } catch {}
+
+  const compound = (top, bottom) => bottom === 8 && [6, 9, 12].includes(top);
+  const beatCount = () => settings.numerator / (compound(settings.numerator, settings.denominator) ? 3 : 1);
+  const option = value => new Option(value, value);
+  numerator.replaceChildren(...Array.from({length: 12}, (_, i) => option(i + 1)));
+  denominator.replaceChildren(...denominators.map(option));
+
+  let pending = false;
+  let generation = 0;
+  let playback = null;
+  let frame;
+  let activeBeat;
+  const nodes = new Set();
+
+  function markBeat(index) {
+    if (activeBeat === index) return;
+    beats.children[activeBeat]?.classList.remove('is-current');
+    beats.children[index]?.classList.add('is-current');
+    activeBeat = index;
+  }
+
+  function render() {
+    tempo.value = settings.bpm;
+    find('#metroMeter').textContent = settings.numerator + '/' + settings.denominator;
+    find('#metroDivision').textContent = '每拍 ' + settings.subdivision + ' 下';
+    beats.replaceChildren(...Array.from({length: beatCount()}, (_, i) => {
+      const dot = document.createElement('span');
+      dot.textContent = i + 1;
+      return dot;
+    }));
+    activeBeat = -1;
+  }
+
+  function renderPlay() {
+    const running = pending || playback;
+    find('#metroPlayIcon').textContent = running ? '■' : '▶';
+    find('#metroPlayLabel').textContent = running ? '停止' : '开始';
+  }
+
+  function clearSchedule() {
+    cancelAnimationFrame(frame);
+    for (const node of nodes) {
+      try { node.stop(); } catch {}
+    }
+    nodes.clear();
+    markBeat(-1);
+  }
+
+  function stop(message = '') {
+    generation++;
+    pending = false;
+    playback = null;
+    clearSchedule();
+    renderPlay();
+    status.textContent = message;
+  }
+
+  function pump() {
+    const run = playback;
+    if (run.audio.state !== 'running') {
+      stop('音频已中断，请点「开始」重新打拍。');
+      return;
+    }
+    const now = run.audio.currentTime;
+    const elapsed = Math.floor((now - run.start) / run.interval);
+    if (elapsed >= 0) markBeat(Math.floor(elapsed / settings.subdivision) % run.beats);
+
+    // Use the audio clock for exact spacing. Skip ticks missed during a stalled frame.
+    run.next = Math.max(run.next, elapsed + 1);
+    while (run.start + run.next * run.interval <= now + .12) {
+      const tick = run.next++;
+      const start = run.start + tick * run.interval;
+      const beat = Math.floor(tick / settings.subdivision) % run.beats;
+      const offbeat = tick % settings.subdivision !== 0;
+      const node = tone(offbeat ? 560 : beat === 0 ? 1500 : 960, start, offbeat ? .033 : .05, true);
+      nodes.add(node);
+      node.addEventListener('ended', () => nodes.delete(node), {once: true});
+    }
+    frame = requestAnimationFrame(pump);
+  }
+
+  function schedule(audio) {
+    playback = {
+      audio, start: audio.currentTime + .07, next: 0, beats: beatCount(),
+      interval: 60 / settings.bpm / settings.subdivision
+    };
+    pump();
+  }
+
+  function update(next) {
+    if (Object.keys(next).every(key => settings[key] === next[key])) {
+      tempo.value = settings.bpm;
+      return;
+    }
+    const audio = playback?.audio;
+    if (audio) clearSchedule();
+    settings = {...settings, ...next};
+    try { localStorage.setItem(storageKey, JSON.stringify(settings)); } catch {}
+    render();
+    if (audio) schedule(audio);
+  }
+
+  function setTempo(value) {
+    update({bpm: Number.isInteger(value) ? Math.min(240, Math.max(20, value)) : settings.bpm});
+  }
+
+  tempo.addEventListener('change', () => setTempo(/^\d+$/.test(tempo.value) ? Number(tempo.value) : NaN));
+  tempo.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.isComposing) tempo.blur();
+  });
+  find('#metroSlower').onclick = () => setTempo(settings.bpm - 1);
+  find('#metroFaster').onclick = () => setTempo(settings.bpm + 1);
+  view.querySelectorAll('[data-metro-tempo]').forEach(button => {
+    button.onclick = () => setTempo(Number(button.dataset.metroTempo));
+  });
+
+  find('#metroPlay').onclick = async () => {
+    if (pending || playback) {
+      stop();
+      return;
+    }
+    const token = ++generation;
+    pending = true;
+    renderPlay();
+    status.textContent = '';
+    try {
+      await audioReady();
+      if (token !== generation) return;
+      pending = false;
+      schedule(context());
+    } catch {
+      if (token === generation) stop('无法启动音频，请点「开始」重试。');
+    }
+  };
+
+  function selectSubdivision(value) {
+    find('input[name="metroSubdivision"][value="' + value + '"]').checked = true;
+  }
+
+  function renderDraftMeter() {
+    const top = Number(numerator.value);
+    const bottom = Number(denominator.value);
+    for (const button of presets) {
+      button.setAttribute('aria-pressed', String(button.dataset.meter === top + '/' + bottom));
+    }
+    const isCompound = compound(top, bottom);
+    const unit = isCompound ? '附点四分音符' : {2: '二分音符', 4: '四分音符', 8: '八分音符', 16: '十六分音符'}[bottom];
+    find('#metroBeatUnit').textContent = '每小节 ' + (isCompound ? top / 3 : top) + ' 拍 · ' + unit + '为一拍';
+  }
+
+  let draftCompound;
+  function changeDraftMeter() {
+    const nextCompound = compound(Number(numerator.value), Number(denominator.value));
+    if (nextCompound !== draftCompound) selectSubdivision(nextCompound ? 3 : 1);
+    draftCompound = nextCompound;
+    renderDraftMeter();
+  }
+
+  settingsButton.onclick = () => {
+    numerator.value = settings.numerator;
+    denominator.value = settings.denominator;
+    draftCompound = compound(settings.numerator, settings.denominator);
+    selectSubdivision(settings.subdivision);
+    renderDraftMeter();
+    sheet.showModal();
+  };
+  find('#metroCancel').onclick = () => sheet.close();
+  for (const button of presets) {
+    button.onclick = () => {
+      const [top, bottom] = button.dataset.meter.split('/');
+      numerator.value = top;
+      denominator.value = bottom;
+      changeDraftMeter();
+    };
+  }
+  numerator.onchange = denominator.onchange = changeDraftMeter;
+  find('#metroForm').onsubmit = event => {
+    event.preventDefault();
+    update({
+      numerator: Number(numerator.value),
+      denominator: Number(denominator.value),
+      subdivision: Number(find('input[name="metroSubdivision"]:checked').value)
+    });
+    sheet.close();
+  };
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && (pending || playback)) stop('离开页面时已停止。');
+  });
+  window.addEventListener('pagehide', () => stop());
+  render();
+  return {
+    show() {
+      document.body.classList.add('metronome-mode');
+      view.hidden = false;
+    },
+    hide() {
+      if (view.hidden) return;
+      stop();
+      sheet.close();
+      view.hidden = true;
+      document.body.classList.remove('metronome-mode');
+    }
+  };
+}
 </script><script>(function(){
 'use strict';
 const {lessons,planned}=CelloLibrary,C=CelloCore,N=CelloNotation,F=CelloFingerboard,$=s=>document.querySelector(s),KEY='cello-notebook-records-v1';
@@ -582,7 +1086,7 @@ async function audioReady(){
  if(ctx.state!=='running')throw Error('音频被系统暂停，请再次点击播放。');
  const active=ctx;active.onstatechange=()=>{if(ctx===active&&active.state!=='running'&&active.state!=='closed')audioNeedsReset=true;};audioNeedsReset=false;lastAudioReadyAt=Date.now();
 }
-function tone(hz,start,duration,click=false){const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=click?'sine':'triangle';osc.frequency.value=hz;const end=start+duration;gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(click?.10:.13,start+.007);gain.gain.setValueAtTime(click?.08:.11,Math.max(start+.008,end-.025));gain.gain.linearRampToValueAtTime(0,end);osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(end+.01);activeNodes.add(osc);osc.onended=()=>{activeNodes.delete(osc);osc.disconnect();gain.disconnect();};}
+function tone(hz,start,duration,click=false){const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=click?'sine':'triangle';osc.frequency.value=hz;const end=start+duration;gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(click?.10:.13,start+.007);gain.gain.setValueAtTime(click?.08:.11,Math.max(start+.008,end-.025));gain.gain.linearRampToValueAtTime(0,end);osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(end+.01);activeNodes.add(osc);osc.onended=()=>{activeNodes.delete(osc);osc.disconnect();gain.disconnect();};return osc;}
 function clearActive(keepLine=false){document.querySelectorAll('.note-event.active').forEach(e=>e.classList.remove('active'));if(!keepLine)document.querySelectorAll('.score-line.playing').forEach(e=>e.classList.remove('playing'));}
 function followActiveNote(el,r){const line=el.closest('.score-line');if(!line)return;const behavior=matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';if(r.activeLine!==line){r.activeLine?.classList.remove('playing');r.activeLine=line;line.classList.add('playing');if($('#followScore').checked)line.scrollIntoView({behavior,block:'center',inline:'nearest'});}if($('#followScore').checked&&line.scrollWidth>line.clientWidth){const note=el.getBoundingClientRect(),box=line.getBoundingClientRect(),left=Math.max(0,Math.min(line.scrollWidth-line.clientWidth,line.scrollLeft+note.left-box.left+note.width/2-line.clientWidth/2));line.scrollTo({left,behavior});}}
 function stop(message=true){generation++;if(frame)cancelAnimationFrame(frame);frame=null;run=null;paused=null;for(const n of activeNodes)try{n.stop();}catch(e){}activeNodes.clear();clearActive();$('#progress').style.width='0%';$('#play').textContent='▶ 播放';if(message)$('#playerStatus').textContent='已停止。';}
@@ -603,7 +1107,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(ctx)aud
 $('#play').onclick=()=>run?pause():play();$('#stop').onclick=()=>stop();['tempo','countIn','metronome','loop','repeat','playbackMode'].forEach(id=>$('#'+id).onchange=()=>{stop();if(id==='tempo')$('#recordTempo').value=$('#tempo').value;if(id==='playbackMode'&&$('#playbackMode').value==='beats')$('#metronome').checked=true;});$('#followScore').onchange=()=>{if($('#followScore').checked&&run?.last>=0){const e=run.plan.entries[run.last],el=document.querySelector(`[data-note="${current.id}:${e.bar}:${e.index}"]`);run.activeLine=null;if(el)followActiveNote(el,run);}};['from','to'].forEach(id=>$('#'+id).onchange=()=>{stop();validSelection();renderScore();});$('#whole').onclick=()=>{stop();$('#from').value=1;$('#to').value=current.bars.length;renderScore();};
 document.querySelectorAll('[data-layer]').forEach(el=>el.onchange=()=>{layers[el.dataset.layer]=el.checked;renderScore();});function syncLayers(){document.querySelectorAll('[data-layer]').forEach(e=>e.checked=layers[e.dataset.layer]);renderScore();}$('#answers').onclick=()=>{['names','fingering'].forEach(k=>layers[k]=true);syncLayers();};$('#hideAnswers').onclick=()=>{['names','fingering','jianpu'].forEach(k=>layers[k]=false);syncLayers();};
 function switchTab(id){document.querySelectorAll('[role=tabpanel]').forEach(p=>p.hidden=p.id!==id);document.querySelectorAll('[role=tab]').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===id)));}document.querySelectorAll('[role=tab]').forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
-document.addEventListener('keydown',e=>{const target=e.target instanceof Element?e.target:null;if(e.code!=='Space'||e.repeat||e.isComposing||$('#scorePanel').hidden||target?.closest('input,textarea,select,button,a,[role=button],[contenteditable=true]'))return;e.preventDefault();if(run)pause();else play();});
+document.addEventListener('keydown',e=>{const target=e.target instanceof Element?e.target:null;if($('#lessonView').hidden||e.code!=='Space'||e.repeat||e.isComposing||$('#scorePanel').hidden||target?.closest('input,textarea,select,button,a,[role=button],[contenteditable=true]'))return;e.preventDefault();if(run)pause();else play();});
 function saveRecords(candidate){if(!storageReady)throw Error('本地记录无法安全读取；请先导出当前记录并保留原浏览器数据。');const raw=localStorage.getItem(KEY),latest=raw?C.parseBackup(raw):[];const combined=C.mergeRecords(latest,candidate).records;if(combined.length>10000)throw Error('记录超过 10000 条，请先导出备份后删除旧记录。');const envelope={format:'cello-notebook-records',version:1,records:combined},serialized=JSON.stringify(envelope);if(serialized.length>5e6)throw Error('记录备份超过 5 MB，请先导出备份后删除旧记录。');localStorage.setItem(KEY,serialized);records=combined;}
 function renderRecords(){const filtered=records.filter(r=>r.lessonId===current.id).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));$('#recordCount').textContent=filtered.length;$('#records').innerHTML=filtered.length?filtered.map(r=>`<article class="card record-entry"><div class="record-meta">${N.esc(r.date)} · ${r.tempo} 拍/分钟 · ${N.esc(r.status)}</div><p class="note-body">${N.esc(r.note||'本次未填写备注。')}</p></article>`).join(''):'<div class="empty">这首曲子还没有练习记录。</div>';if(!storageReady)$('#recordMessage').textContent='当前浏览器无法读取本地记录，原数据未被改写。';}
 $('#recordNote').oninput=()=>pendingInput=true;$('#recordForm').onsubmit=e=>{e.preventDefault();const r={id:crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(16).slice(2),lessonId:current.id,date:$('#recordDate').value,tempo:Number($('#recordTempo').value),status:$('#recordStatus').value,note:$('#recordNote').value.trim(),createdAt:new Date().toISOString()};if(!C.checkRecord(r)){$('#recordMessage').textContent='请检查日期、速度与备注。';return;}try{saveRecords([...records,r]);$('#recordMessage').textContent='已保存在当前浏览器。';$('#recordNote').value='';drafts.delete(current.id);pendingInput=[...drafts.values()].some(d=>d.note);renderRecords();}catch(e){$('#recordMessage').textContent='保存未成功：'+e.message;}};
@@ -611,9 +1115,12 @@ function download(name,text,type){const blob=new Blob([text],{type}),url=URL.cre
 $('#exportRecords').onclick=()=>download('cello-records-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json',JSON.stringify({format:'cello-notebook-records',version:1,exportedAt:new Date().toISOString(),records},null,2),'application/json');
 $('#importRecords').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>5e6)throw Error('文件超过 5 MB');const incoming=C.parseBackup(await file.text()),merged=C.mergeRecords(records,incoming);saveRecords(merged.records);$('#recordMessage').textContent=`导入完成：新增 ${merged.added} 条，跳过重复 ${merged.duplicates} 条，冲突保留两份 ${merged.conflicts} 条。`;renderRecords();}catch(error){$('#recordMessage').textContent='未导入，原记录保留：'+error.message;}e.target.value='';};
 $('#print').onclick=async()=>{stop(false);$('#printRoot').innerHTML=printHtml();await document.fonts.ready;window.print();};window.addEventListener('beforeprint',()=>$('#printRoot').innerHTML=printHtml());
-function route(){const target=decodeURIComponent(location.hash.slice(1));if(!target||target==='home'){showHome();return;}if(target==='fingerboard'){showFingerboard();return;}if(target==='practice'){loadLesson(lessons[0]);return;}const found=lessons.find(l=>l.id===target);if(found){loadLesson(found);return;}showHome();}
+const metro=createMetronome({audioReady,context:()=>ctx,tone});
+function route(){const target=decodeURIComponent(location.hash.slice(1));
+ if(target==='metronome'){showHome();$('#homeView').hidden=true;metro.show();document.title='节拍器 · 大提琴练习册';return;}
+ metro.hide();if(!target||target==='home'){showHome();return;}if(target==='fingerboard'){showFingerboard();return;}if(target==='practice'){loadLesson(lessons[0]);return;}const found=lessons.find(l=>l.id===target);if(found){loadLesson(found);return;}showHome();}
 let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(!$('#lessonView').hidden)renderScore();if(!$('#fingerboardView').hidden)renderFingerboard();},120);});window.addEventListener('beforeunload',e=>{if(pendingInput){e.preventDefault();e.returnValue='';}});window.addEventListener('hashchange',route);window.addEventListener('storage',e=>{if(e.key===KEY&&e.newValue){try{records=C.mergeRecords(records,C.parseBackup(e.newValue)).records;renderRecords();}catch{}}});
-window.CelloApp={lesson:()=>current,selection,plan:()=>run?.plan||paused?.plan||null,playbackState:()=>run?'playing':paused?'paused':'stopped',playbackMode:()=>run?.melody?'music':paused?paused.melody?'music':'beats':$('#playbackMode').value,audioState:()=>ctx?.state||'not-started',printHtml,recordCount:()=>records.length,view:()=>$('#homeView').hidden?$('#lessonView').hidden?'fingerboard':'lesson':'home',fingerboardSelection:()=>fingerboardSelected?{pitch:fingerboardSelected.pitch,hz:fingerboardSelected.info.hz,string:fingerboardSelected.string,finger:fingerboardSelected.finger,position:fingerboardSelected.positionName}:null};
+window.CelloApp={lesson:()=>current,selection,plan:()=>run?.plan||paused?.plan||null,playbackState:()=>run?'playing':paused?'paused':'stopped',playbackMode:()=>run?.melody?'music':paused?paused.melody?'music':'beats':$('#playbackMode').value,audioState:()=>ctx?.state||'not-started',printHtml,recordCount:()=>records.length,view:()=>!$('#metronomeView').hidden?'metronome':$('#homeView').hidden?$('#lessonView').hidden?'fingerboard':'lesson':'home',fingerboardSelection:()=>fingerboardSelected?{pitch:fingerboardSelected.pitch,hz:fingerboardSelected.info.hz,string:fingerboardSelected.string,finger:fingerboardSelected.finger,position:fingerboardSelected.positionName}:null};
 route();
 // Optional browser agent access configures the same controls, without starting audio.
 if(document.modelContext?.registerTool){const life=new AbortController();window.addEventListener('pagehide',()=>life.abort(),{once:true});const tools=[

@@ -10,7 +10,7 @@ const {chromium}=require(playwrightPath);
    window.__fingerboardTones=[];window.__rejectFingerboardAudio=false;
    window.AudioContext=class{constructor(){this.state='suspended';this.currentTime=0;this.destination={};}resume(){if(window.__rejectFingerboardAudio)return Promise.reject(Error('rejected'));this.state='running';return Promise.resolve();}createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){}},connect(){},disconnect(){}};}createOscillator(){const osc={frequency:{value:0},connect(){},disconnect(){},start(){window.__fingerboardTones.push(osc.frequency.value);},stop(){queueMicrotask(()=>osc.onended?.());}};return osc;}};
   });
-  await page.goto('http://127.0.0.1:4317');assert.equal(await page.evaluate(()=>CelloApp.view()),'home');assert.equal(await page.locator('.sidebar').isVisible(),false);assert.equal(await page.locator('.home-card').count(),2);console.log('home ok');
+  await page.goto('http://127.0.0.1:4317');assert.equal(await page.evaluate(()=>CelloApp.view()),'home');assert.equal(await page.locator('.sidebar').isVisible(),false);assert.equal(await page.locator('.home-card').count(),3);assert.equal(await page.locator('.home-card[href="#metronome"]').count(),1);console.log('home ok');
   await page.click('a[href="#practice"]');await page.waitForFunction(()=>CelloApp.view()==='lesson');assert.equal(await page.locator('#title').textContent(),'风之歌');
   await page.goto('http://127.0.0.1:4317/#d-major-up');await page.waitForFunction(()=>CelloApp.lesson().id==='d-major-up');assert.equal(await page.evaluate(()=>CelloApp.view()),'lesson');
   await page.goBack();await page.waitForFunction(()=>CelloApp.view()==='lesson');assert.equal(await page.evaluate(()=>CelloApp.lesson().id),'song-of-the-wind');
