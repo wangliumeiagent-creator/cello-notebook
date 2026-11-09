@@ -142,3 +142,7 @@ gh run list --repo wangliumeiagent-creator/cello-notebook --limit 3
 ## 便携包
 
 `python scripts/package_release.py` 打包已有 dist 为版本 ZIP，不会重新构建或生成 PDF。已有同名 ZIP 时脚本拒绝覆盖；先确认版本和输出路径，不删除旧包。版本变化时同步 package.json、dist/package.json、使用说明与打包脚本；dist/使用说明.txt 要与根说明一致。
+
+## 与微信小程序协同开发
+
+必读 [双端开发规范](CROSS_PLATFORM_DEVELOPMENT.md)。曲目、音高节奏和通用功能变更必须核对独立小程序仓库 cello-miniprogram，记录同步修改/已一致/平台专属结论。小程序曲库由本仓库已提交源码生成；网页部署与微信上传分别验证，互不代替。
