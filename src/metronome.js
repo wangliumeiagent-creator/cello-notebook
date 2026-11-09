@@ -8,6 +8,7 @@ function createMetronome({audioReady, context, tone}) {
   const denominator = find('#metroDenominator');
   const presets = [...view.querySelectorAll('[data-meter]')];
   const beats = find('#metroBeats');
+  const light = find('.metro-dial-light');
   const status = find('#metroStatus');
   const storageKey = 'cello-notebook-metronome-v1';
   const denominators = [2, 4, 8, 16];
@@ -67,6 +68,7 @@ function createMetronome({audioReady, context, tone}) {
     }
     nodes.clear();
     markBeat(-1);
+    light.style.opacity = 0;
   }
 
   function stop(message = '') {
@@ -86,7 +88,19 @@ function createMetronome({audioReady, context, tone}) {
     }
     const now = run.audio.currentTime;
     const elapsed = Math.floor((now - run.start) / run.interval);
-    if (elapsed >= 0) markBeat(Math.floor(elapsed / settings.subdivision) % run.beats);
+    if (elapsed >= 0) {
+      const beatTime = (now - run.start) / run.beatDuration;
+      const beatNumber = Math.floor(beatTime);
+      const beat = beatNumber % run.beats;
+      const phase = beatTime - beatNumber;
+      markBeat(beat);
+      // Count sides across bar lines so odd meters still alternate.
+      light.dataset.side = run.beats === 1 ? 'full' : beatNumber % 2 === 0 ? 'left' : 'right';
+      light.classList.toggle('is-accent', run.beats > 1 && beat === 0);
+      const pulse = run.beats === 1 ? Math.sin(Math.PI * phase) ** 2
+        : Math.max(0, 1 - phase * run.beatDuration / .16);
+      light.style.opacity = pulse;
+    }
 
     // Use the audio clock for exact spacing. Skip ticks missed during a stalled frame.
     run.next = Math.max(run.next, elapsed + 1);
@@ -103,9 +117,10 @@ function createMetronome({audioReady, context, tone}) {
   }
 
   function schedule(audio) {
+    const beatDuration = 60 / settings.bpm;
     playback = {
       audio, start: audio.currentTime + .07, next: 0, beats: beatCount(),
-      interval: 60 / settings.bpm / settings.subdivision
+      beatDuration, interval: beatDuration / settings.subdivision
     };
     pump();
   }
