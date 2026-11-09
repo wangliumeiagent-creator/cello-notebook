@@ -127,17 +127,17 @@ body.metronome-mode {
   background: repeating-conic-gradient(from -.3deg, #77dfff 0deg .62deg, #142535 .7deg 3deg);
 }
 .metro-dial-light {
-  --light: #f687ed;
+  --light: #bc287e;
   position: absolute;
   z-index: 1;
   inset: 7%;
   border-radius: 50%;
-  background: radial-gradient(circle, transparent 48%, var(--light) 68%, transparent 73%);
+  background: radial-gradient(circle, transparent 49%, var(--light) 53% 69%, transparent 72%);
   box-shadow: inset 0 0 18px var(--light);
   opacity: 0;
   pointer-events: none;
 }
-.metro-dial-light.is-accent { --light: #ffbd4f; }
+.metro-dial-light.is-accent { --light: #d77919; }
 .metro-dial-light[data-side=left] { clip-path: inset(0 50% 0 0); }
 .metro-dial-light[data-side=right] { clip-path: inset(0 0 0 50%); }
 @media (prefers-reduced-motion: reduce) {
