@@ -98,8 +98,9 @@ function createMetronome({audioReady, context, tone}) {
       light.dataset.side = run.beats === 1 ? 'full' : beatNumber % 2 === 0 ? 'left' : 'right';
       light.classList.toggle('is-accent', run.beats > 1 && beat === 0);
       const flashProgress = phase * run.beatDuration / run.flashDuration;
-      const pulse = run.beats === 1 ? Math.sin(Math.PI * phase) ** 2
-        : Math.min(1, Math.max(0, (1 - flashProgress) / .65));
+      // Ease both ends so switching halves never starts with a jump in brightness.
+      const fade = Math.max(0, Math.min(flashProgress / .18, 1, (1 - flashProgress) / .55));
+      const pulse = run.beats === 1 ? Math.sin(Math.PI * phase) ** 2 : fade * fade * (3 - 2 * fade);
       light.style.opacity = pulse;
     }
 
@@ -121,7 +122,7 @@ function createMetronome({audioReady, context, tone}) {
     const beatDuration = 60 / settings.bpm;
     playback = {
       audio, start: audio.currentTime + .07, next: 0, beats: beatCount(),
-      beatDuration, flashDuration: Math.min(.32, beatDuration * .88),
+      beatDuration, flashDuration: Math.min(.62, beatDuration * .96),
       interval: beatDuration / settings.subdivision
     };
     pump();
