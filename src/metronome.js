@@ -97,8 +97,9 @@ function createMetronome({audioReady, context, tone}) {
       // Count sides across bar lines so odd meters still alternate.
       light.dataset.side = run.beats === 1 ? 'full' : beatNumber % 2 === 0 ? 'left' : 'right';
       light.classList.toggle('is-accent', run.beats > 1 && beat === 0);
+      const flashProgress = phase * run.beatDuration / run.flashDuration;
       const pulse = run.beats === 1 ? Math.sin(Math.PI * phase) ** 2
-        : Math.max(0, 1 - phase * run.beatDuration / .16);
+        : Math.min(1, Math.max(0, (1 - flashProgress) / .65));
       light.style.opacity = pulse;
     }
 
@@ -120,7 +121,8 @@ function createMetronome({audioReady, context, tone}) {
     const beatDuration = 60 / settings.bpm;
     playback = {
       audio, start: audio.currentTime + .07, next: 0, beats: beatCount(),
-      beatDuration, interval: beatDuration / settings.subdivision
+      beatDuration, flashDuration: Math.min(.32, beatDuration * .88),
+      interval: beatDuration / settings.subdivision
     };
     pump();
   }
