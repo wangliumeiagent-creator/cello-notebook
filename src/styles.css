@@ -127,7 +127,7 @@ body.metronome-mode {
   background: repeating-conic-gradient(from -.3deg, #77dfff 0deg .62deg, #142535 .7deg 3deg);
 }
 .metro-dial-light {
-  --light: #79eaff;
+  --light: #f687ed;
   position: absolute;
   z-index: 1;
   inset: 7%;
@@ -137,7 +137,7 @@ body.metronome-mode {
   opacity: 0;
   pointer-events: none;
 }
-.metro-dial-light.is-accent { --light: #ffc371; }
+.metro-dial-light.is-accent { --light: #ffbd4f; }
 .metro-dial-light[data-side=left] { clip-path: inset(0 50% 0 0); }
 .metro-dial-light[data-side=right] { clip-path: inset(0 0 0 50%); }
 @media (prefers-reduced-motion: reduce) {
