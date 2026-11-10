@@ -336,3 +336,6 @@ body.metronome-mode {
   border-color: var(--metro-cyan);
 }
 .metro-sheet-header { position: sticky; top: 0; z-index: 1; background: #243552; }
+
+.home-brand { display: flex; align-items: center; gap: 10px; }
+.home-brand img { display: block; border-radius: 12px; }
