@@ -287,6 +287,32 @@ body.metronome-mode {
 @media (min-width: 701px) {
   .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+.metro-tempo-presets {
+  margin: 14px 16px;
+  border: 1px solid var(--metro-line);
+  border-radius: 10px;
+  background: #263a59;
+}
+.metro-tempo-presets summary { cursor: pointer; padding: 10px 12px; font-weight: 600; }
+#metroPresetTempo { float: right; color: var(--metro-cyan); font-variant-numeric: tabular-nums; }
+.metro-tempo-presets > p { margin: 0 12px; font-size: 13px; color: #c4d1ee; }
+.metro-tempo-option {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--metro-line);
+  cursor: pointer;
+  font-size: 14px;
+}
+.metro-tempo-option small { display: block; color: #c4d1ee; }
+.metro-tempo-value { white-space: nowrap; }
+.metro-tempo-option:has(:checked) { background: #1f4259; color: var(--metro-cyan); }
+.metro-tempo-option input { accent-color: var(--metro-cyan); margin: 0; }
+.metro-sheet-header { position: sticky; top: 0; z-index: 1; background: #243552; }
 </style></head><body>
 <div class="app-shell"><aside class="sidebar"><a class="brand" href="#home"><span>大提琴练习册<small>第一册 · 拓展曲目</small></span></a><nav id="library" aria-label="练习目录"></nav><div class="sidebar-foot">配合纸质教材与老师的课程<br><span>第一阶段 · 0.4</span></div></aside>
 <main><section id="homeView" class="home-view" aria-labelledby="homeTitle"><div class="eyebrow">大提琴学习伴侣</div><h1 id="homeTitle">今天，从哪里开始？</h1><p class="home-intro">选择一项，开始今天的练习。</p><div class="home-cards"><a class="home-card" href="#practice"><span class="home-icon" aria-hidden="true">♫</span><h2>练习曲</h2><p>看谱、听示范、按曲练习。</p><span>进入练习曲 →</span></a><a class="home-card" href="#fingerboard"><span class="home-icon" aria-hidden="true">⌁</span><h2>指板探索</h2><p>认识四弦、把位、音高与谱位。</p><span>进入指板探索 →</span></a><a class="home-card" href="sight-reading.html"><span class="home-icon" aria-hidden="true">♩</span><h2>读谱反应</h2><p>看谱找弦与手指，逐步撤掉提示，再拿琴练短句。</p><span>进入读谱反应 →</span></a><a class="home-card" href="game.html"><span class="home-icon" aria-hidden="true">♬</span><h2>读谱游戏</h2><p>左手按住指法，右手选弦拉弓，跟随谱面练习。</p><span>进入读谱游戏 →</span></a><a class="home-card" href="#metronome"><span class="home-icon" aria-hidden="true">♩</span><h2>节拍器</h2><p>设定速度和拍号，按自己的节奏练琴。</p><span>进入节拍器 →</span></a></div><p class="muted">试听为合成参考音；具体换把与手型请继续以老师建议为准。</p></section>
@@ -320,9 +346,9 @@ body.metronome-mode {
   </div>
   <div id="metroBeats" class="metro-beats" aria-hidden="true"></div>
   <div class="metro-controls">
-    <button type="button" class="metro-quick" data-metro-tempo="20">20 <small>BPM</small></button>
+    <button type="button" class="metro-quick" data-metro-step="-10" aria-label="降低 10 BPM">−10 <small>BPM</small></button>
     <button type="button" id="metroPlay"><span id="metroPlayIcon" aria-hidden="true">▶</span><span id="metroPlayLabel">开始</span></button>
-    <button type="button" class="metro-quick" data-metro-tempo="30">30 <small>BPM</small></button>
+    <button type="button" class="metro-quick" data-metro-step="10" aria-label="提高 10 BPM">+10 <small>BPM</small></button>
   </div>
   <p id="metroStatus" role="status"></p>
   <dialog id="metroSheet" aria-labelledby="metroSheetTitle">
@@ -332,6 +358,11 @@ body.metronome-mode {
         <h2 id="metroSheetTitle">节拍设置</h2>
         <button type="submit">确定</button>
       </header>
+      <details id="metroTempoPresets" class="metro-tempo-presets">
+        <summary>快速预设 <span id="metroPresetTempo"></span></summary>
+        <p>速度术语的范围仅供参考。选择一项，再点「确定」。</p>
+        <div id="metroTempoGroups"></div>
+      </details>
       <fieldset>
         <legend>拍号</legend>
         <div class="metro-options" id="metroPresets">
@@ -828,6 +859,8 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   const view = document.getElementById('metronomeView');
   const find = selector => view.querySelector(selector);
   const tempo = find('#metroTempo');
+  const tempoPresets = find('#metroTempoPresets');
+  const presetTempo = find('#metroPresetTempo');
   const sheet = find('#metroSheet');
   const settingsButton = find('#metroSettings');
   const numerator = find('#metroNumerator');
@@ -839,15 +872,49 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   const storageKey = 'cello-notebook-metronome-v1';
   const denominators = [2, 4, 8, 16];
   const subdivisions = [1, 2, 3, 4];
-  let settings = { bpm: 60, numerator: 4, denominator: 4, subdivision: 1 };
+  const defaultBpm = 60;
+  let settings = { bpm: defaultBpm, numerator: 4, denominator: 4, subdivision: 1 };
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
-    if (saved && Number.isInteger(saved.bpm) && saved.bpm >= 20 && saved.bpm <= 240
-      && Number.isInteger(saved.numerator) && saved.numerator >= 1 && saved.numerator <= 12
+    if (saved && Number.isInteger(saved.numerator) && saved.numerator >= 1 && saved.numerator <= 12
       && denominators.includes(saved.denominator) && subdivisions.includes(saved.subdivision)) {
-      settings = saved;
+      const {numerator, denominator, subdivision} = saved;
+      settings = {...settings, numerator, denominator, subdivision};
     }
   } catch {}
+
+  // Representative practice tempos from the documented reference ranges.
+  const tempoGroups = [
+    {"label":"慢速","items":[
+      {"term":"Grave","name":"庄板","min":25,"max":45,"bpm":35},
+      {"term":"Largo","name":"广板","min":40,"max":60,"bpm":50},
+      {"term":"Lento","name":"慢板","min":45,"max":60,"bpm":53},
+      {"term":"Larghetto","name":"小广板","min":60,"max":66,"bpm":63},
+      {"term":"Adagio","name":"柔板","min":66,"max":76,"bpm":71},
+      {"term":"Andante","name":"行板","min":76,"max":108,"bpm":92},
+      {"term":"Andantino","name":"小行板","min":80,"max":108,"bpm":94}
+    ]},
+    {"label":"中速","items":[
+      {"term":"Moderato","name":"中板","min":108,"max":120,"bpm":114}
+    ]},
+    {"label":"快速","items":[
+      {"term":"Allegretto","name":"小快板","min":112,"max":120,"bpm":116},
+      {"term":"Allegro","name":"快板","min":120,"max":168,"bpm":144},
+      {"term":"Vivace","name":"活板","min":168,"max":176,"bpm":172},
+      {"term":"Presto","name":"急板","min":168,"max":200,"bpm":184},
+      {"term":"Prestissimo","name":"最急板","min":200,"max":240,"bpm":220}
+    ]}
+  ];
+  find('#metroTempoGroups').innerHTML = tempoGroups.map(({label,items}) => `
+    <fieldset><legend>${label}</legend>${items.map(({term,name,min,max,bpm}) => `
+      <label class="metro-tempo-option">
+        <span><strong>${term} ${name}</strong><small>参考 ${min}–${max} BPM</small></span>
+        <span class="metro-tempo-value">${bpm} BPM</span>
+        <input type="radio" name="metroTempoPreset" value="${bpm}">
+      </label>`).join('')}</fieldset>`).join('');
+  tempoPresets.onchange = event => {
+    presetTempo.textContent = event.target.value + ' BPM';
+  };
 
   const compound = (top, bottom) => bottom === 8 && [6, 9, 12].includes(top);
   const beatCount = () => settings.numerator / (compound(settings.numerator, settings.denominator) ? 3 : 1);
@@ -961,8 +1028,12 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
     }
     const audio = playback?.audio;
     if (audio) clearSchedule();
+    const previous = settings;
     settings = {...settings, ...next};
-    try { localStorage.setItem(storageKey, JSON.stringify(settings)); } catch {}
+    const {numerator, denominator, subdivision} = settings;
+    if (previous.numerator !== numerator || previous.denominator !== denominator || previous.subdivision !== subdivision) {
+      try { localStorage.setItem(storageKey, JSON.stringify({numerator, denominator, subdivision})); } catch {}
+    }
     render();
     if (audio) schedule(audio);
   }
@@ -977,8 +1048,8 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   });
   find('#metroSlower').onclick = () => setTempo(settings.bpm - 1);
   find('#metroFaster').onclick = () => setTempo(settings.bpm + 1);
-  view.querySelectorAll('[data-metro-tempo]').forEach(button => {
-    button.onclick = () => setTempo(Number(button.dataset.metroTempo));
+  view.querySelectorAll('[data-metro-step]').forEach(button => {
+    button.onclick = () => setTempo(settings.bpm + Number(button.dataset.metroStep));
   });
 
   find('#metroPlay').onclick = async () => {
@@ -1024,6 +1095,11 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   }
 
   settingsButton.onclick = () => {
+    tempoPresets.open = false;
+    presetTempo.textContent = settings.bpm + ' BPM';
+    view.querySelectorAll('input[name="metroTempoPreset"]').forEach(input => {
+      input.checked = Number(input.value) === settings.bpm;
+    });
     numerator.value = settings.numerator;
     denominator.value = settings.denominator;
     draftCompound = compound(settings.numerator, settings.denominator);
@@ -1043,7 +1119,9 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   numerator.onchange = denominator.onchange = changeDraftMeter;
   find('#metroForm').onsubmit = event => {
     event.preventDefault();
+    const selected = find('input[name="metroTempoPreset"]:checked');
     update({
+      bpm: selected ? Number(selected.value) : settings.bpm,
       numerator: Number(numerator.value),
       denominator: Number(denominator.value),
       subdivision: Number(find('input[name="metroSubdivision"]:checked').value)
@@ -1055,9 +1133,13 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
     if (document.hidden && (pending || playback)) stop('离开页面时已停止。');
   });
   window.addEventListener('pagehide', () => stop());
+  window.addEventListener('pageshow', event => {
+    if (event.persisted && !view.hidden) setTempo(defaultBpm);
+  });
   render();
   return {
     show() {
+      if (view.hidden) setTempo(defaultBpm);
       document.body.classList.add('metronome-mode');
       view.hidden = false;
     },
