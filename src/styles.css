@@ -288,28 +288,51 @@ body.metronome-mode {
   .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-.metro-tempo-presets {
-  margin: 14px 16px;
+.metro-tempo-entry, .metro-tempo-tabs button, .metro-tempo-option {
   border: 1px solid var(--metro-line);
-  border-radius: 10px;
   background: #263a59;
+  color: #f1f5ff;
 }
-.metro-tempo-presets summary { cursor: pointer; padding: 10px 12px; font-weight: 600; }
-#metroPresetTempo { float: right; color: var(--metro-cyan); font-variant-numeric: tabular-nums; }
-.metro-tempo-presets > p { margin: 0 12px; font-size: 13px; color: #c4d1ee; }
-.metro-tempo-option {
+.metro-tempo-entry:hover, .metro-tempo-tabs button:hover, .metro-tempo-option:hover {
+  background: #30476b;
+}
+.metro-tempo-entry {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 32px);
+  min-height: 44px;
+  margin: 14px 16px 0;
+  text-align: left;
+  font-weight: 600;
+}
+.metro-tempo-entry > span:last-child { color: var(--metro-cyan); font-variant-numeric: tabular-nums; }
+#metroTempoPanel .metro-sheet-header button { justify-self: start; }
+.metro-tempo-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 12px 16px 6px; }
+.metro-tempo-tabs button { min-height: 44px; }
+.metro-tempo-hint { margin: 0 16px 6px; font-size: 13px; color: #c4d1ee; }
+.metro-tempo-list {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  gap: 5px;
+  max-height: 42vh;
+  max-height: 42dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 16px 8px;
+}
+.metro-tempo-option {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
-  min-height: 52px;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--metro-line);
-  cursor: pointer;
-  font-size: 14px;
+  min-height: 50px;
+  padding: 5px 8px;
+  text-align: left;
 }
 .metro-tempo-option small { display: block; color: #c4d1ee; }
 .metro-tempo-value { white-space: nowrap; }
-.metro-tempo-option:has(:checked) { background: #1f4259; color: var(--metro-cyan); }
-.metro-tempo-option input { accent-color: var(--metro-cyan); margin: 0; }
+.metro-tempo-tabs button[aria-pressed=true], .metro-tempo-option[aria-pressed=true] {
+  background: #1f4259;
+  color: var(--metro-cyan);
+  border-color: var(--metro-cyan);
+}
 .metro-sheet-header { position: sticky; top: 0; z-index: 1; background: #243552; }

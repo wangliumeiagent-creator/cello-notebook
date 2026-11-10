@@ -2,7 +2,11 @@ function createMetronome({audioReady, context, tone}) {
   const view = document.getElementById('metronomeView');
   const find = selector => view.querySelector(selector);
   const tempo = find('#metroTempo');
-  const tempoPresets = find('#metroTempoPresets');
+  const settingsPanel = find('#metroSettingsPanel');
+  const tempoPanel = find('#metroTempoPanel');
+  const tempoEntry = find('#metroOpenTempos');
+  const tempoTabs = find('#metroTempoGroups');
+  const tempoList = find('#metroTempoList');
   const presetTempo = find('#metroPresetTempo');
   const sheet = find('#metroSheet');
   const settingsButton = find('#metroSettings');
@@ -48,16 +52,61 @@ function createMetronome({audioReady, context, tone}) {
       {"term":"Prestissimo","name":"最急板","min":200,"max":240,"bpm":220}
     ]}
   ];
-  find('#metroTempoGroups').innerHTML = tempoGroups.map(({label,items}) => `
-    <fieldset><legend>${label}</legend>${items.map(({term,name,min,max,bpm}) => `
-      <label class="metro-tempo-option">
+  tempoTabs.innerHTML = tempoGroups.map(({label},index) =>
+    `<button type="button" data-tempo-group="${index}" aria-pressed="false">${label}</button>`).join('');
+  let draftBpm;
+
+  function showTempoGroup(index) {
+    for (const button of tempoTabs.children) {
+      button.setAttribute('aria-pressed', String(Number(button.dataset.tempoGroup) === index));
+    }
+    tempoList.innerHTML = tempoGroups[index].items.map(({term,name,min,max,bpm}) => `
+      <button type="button" class="metro-tempo-option" data-bpm="${bpm}" aria-pressed="${bpm === draftBpm}">
         <span><strong>${term} ${name}</strong><small>参考 ${min}–${max} BPM</small></span>
         <span class="metro-tempo-value">${bpm} BPM</span>
-        <input type="radio" name="metroTempoPreset" value="${bpm}">
-      </label>`).join('')}</fieldset>`).join('');
-  tempoPresets.onchange = event => {
-    presetTempo.textContent = event.target.value + ' BPM';
+      </button>`).join('');
+    tempoList.scrollTop = 0;
+  }
+
+  function showSettingsPanel() {
+    tempoPanel.hidden = true;
+    settingsPanel.hidden = false;
+    sheet.setAttribute('aria-labelledby','metroSheetTitle');
+    presetTempo.textContent = draftBpm + ' BPM';
+    sheet.scrollTop = 0;
+  }
+
+  function backFromTempos() {
+    showSettingsPanel();
+    tempoEntry.focus();
+  }
+
+  tempoEntry.onclick = () => {
+    const index = Math.max(0,tempoGroups.findIndex(group => group.items.some(item => item.bpm === draftBpm)));
+    settingsPanel.hidden = true;
+    tempoPanel.hidden = false;
+    sheet.setAttribute('aria-labelledby','metroTempoTitle');
+    sheet.scrollTop = 0;
+    showTempoGroup(index);
+    tempoTabs.children[index].focus();
   };
+  tempoTabs.onclick = event => {
+    const button = event.target.closest('[data-tempo-group]');
+    if (button) showTempoGroup(Number(button.dataset.tempoGroup));
+  };
+  tempoList.onclick = event => {
+    const button = event.target.closest('[data-bpm]');
+    if (!button) return;
+    draftBpm = Number(button.dataset.bpm);
+    backFromTempos();
+  };
+  find('#metroBackFromTempos').onclick = backFromTempos;
+  sheet.addEventListener('cancel', event => {
+    if (!tempoPanel.hidden) {
+      event.preventDefault();
+      backFromTempos();
+    }
+  });
 
   const compound = (top, bottom) => bottom === 8 && [6, 9, 12].includes(top);
   const beatCount = () => settings.numerator / (compound(settings.numerator, settings.denominator) ? 3 : 1);
@@ -238,11 +287,8 @@ function createMetronome({audioReady, context, tone}) {
   }
 
   settingsButton.onclick = () => {
-    tempoPresets.open = false;
-    presetTempo.textContent = settings.bpm + ' BPM';
-    view.querySelectorAll('input[name="metroTempoPreset"]').forEach(input => {
-      input.checked = Number(input.value) === settings.bpm;
-    });
+    draftBpm = settings.bpm;
+    showSettingsPanel();
     numerator.value = settings.numerator;
     denominator.value = settings.denominator;
     draftCompound = compound(settings.numerator, settings.denominator);
@@ -262,9 +308,9 @@ function createMetronome({audioReady, context, tone}) {
   numerator.onchange = denominator.onchange = changeDraftMeter;
   find('#metroForm').onsubmit = event => {
     event.preventDefault();
-    const selected = find('input[name="metroTempoPreset"]:checked');
+    if (settingsPanel.hidden) return;
     update({
-      bpm: selected ? Number(selected.value) : settings.bpm,
+      bpm: draftBpm,
       numerator: Number(numerator.value),
       denominator: Number(denominator.value),
       subdivision: Number(find('input[name="metroSubdivision"]:checked').value)

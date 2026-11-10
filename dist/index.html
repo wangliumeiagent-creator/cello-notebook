@@ -288,30 +288,53 @@ body.metronome-mode {
   .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-.metro-tempo-presets {
-  margin: 14px 16px;
+.metro-tempo-entry, .metro-tempo-tabs button, .metro-tempo-option {
   border: 1px solid var(--metro-line);
-  border-radius: 10px;
   background: #263a59;
+  color: #f1f5ff;
 }
-.metro-tempo-presets summary { cursor: pointer; padding: 10px 12px; font-weight: 600; }
-#metroPresetTempo { float: right; color: var(--metro-cyan); font-variant-numeric: tabular-nums; }
-.metro-tempo-presets > p { margin: 0 12px; font-size: 13px; color: #c4d1ee; }
-.metro-tempo-option {
+.metro-tempo-entry:hover, .metro-tempo-tabs button:hover, .metro-tempo-option:hover {
+  background: #30476b;
+}
+.metro-tempo-entry {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 32px);
+  min-height: 44px;
+  margin: 14px 16px 0;
+  text-align: left;
+  font-weight: 600;
+}
+.metro-tempo-entry > span:last-child { color: var(--metro-cyan); font-variant-numeric: tabular-nums; }
+#metroTempoPanel .metro-sheet-header button { justify-self: start; }
+.metro-tempo-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 12px 16px 6px; }
+.metro-tempo-tabs button { min-height: 44px; }
+.metro-tempo-hint { margin: 0 16px 6px; font-size: 13px; color: #c4d1ee; }
+.metro-tempo-list {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  gap: 5px;
+  max-height: 42vh;
+  max-height: 42dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 16px 8px;
+}
+.metro-tempo-option {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 10px;
-  min-height: 52px;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--metro-line);
-  cursor: pointer;
-  font-size: 14px;
+  min-height: 50px;
+  padding: 5px 8px;
+  text-align: left;
 }
 .metro-tempo-option small { display: block; color: #c4d1ee; }
 .metro-tempo-value { white-space: nowrap; }
-.metro-tempo-option:has(:checked) { background: #1f4259; color: var(--metro-cyan); }
-.metro-tempo-option input { accent-color: var(--metro-cyan); margin: 0; }
+.metro-tempo-tabs button[aria-pressed=true], .metro-tempo-option[aria-pressed=true] {
+  background: #1f4259;
+  color: var(--metro-cyan);
+  border-color: var(--metro-cyan);
+}
 .metro-sheet-header { position: sticky; top: 0; z-index: 1; background: #243552; }
 </style></head><body>
 <div class="app-shell"><aside class="sidebar"><a class="brand" href="#home"><span>大提琴练习册<small>第一册 · 拓展曲目</small></span></a><nav id="library" aria-label="练习目录"></nav><div class="sidebar-foot">配合纸质教材与老师的课程<br><span>第一阶段 · 0.4</span></div></aside>
@@ -353,41 +376,50 @@ body.metronome-mode {
   <p id="metroStatus" role="status"></p>
   <dialog id="metroSheet" aria-labelledby="metroSheetTitle">
     <form id="metroForm">
-      <header class="metro-sheet-header">
-        <button type="button" id="metroCancel">取消</button>
-        <h2 id="metroSheetTitle">节拍设置</h2>
-        <button type="submit">确定</button>
-      </header>
-      <details id="metroTempoPresets" class="metro-tempo-presets">
-        <summary>快速预设 <span id="metroPresetTempo"></span></summary>
-        <p>速度术语的范围仅供参考。选择一项，再点「确定」。</p>
-        <div id="metroTempoGroups"></div>
-      </details>
-      <fieldset>
-        <legend>拍号</legend>
-        <div class="metro-options" id="metroPresets">
-          <button type="button" data-meter="2/4">2/4</button>
-          <button type="button" data-meter="3/4">3/4</button>
-          <button type="button" data-meter="4/4">4/4</button>
-          <button type="button" data-meter="5/4">5/4</button>
-          <button type="button" data-meter="6/8">6/8</button>
-        </div>
-        <div class="metro-custom">
-          <label>分子 <select id="metroNumerator"></select></label>
-          <span aria-hidden="true">/</span>
-          <label>分母 <select id="metroDenominator"></select></label>
-        </div>
-        <p id="metroBeatUnit"></p>
-      </fieldset>
-      <fieldset>
-        <legend>拍内细分</legend>
-        <div class="metro-options metro-divisions">
-          <label><input type="radio" name="metroSubdivision" value="1"><span><b aria-hidden="true">♩</b>每拍 1 下</span></label>
-          <label><input type="radio" name="metroSubdivision" value="2"><span><b aria-hidden="true">♫</b>每拍 2 下</span></label>
-          <label><input type="radio" name="metroSubdivision" value="3"><span><b aria-hidden="true">♪♪♪</b>每拍 3 下</span></label>
-          <label><input type="radio" name="metroSubdivision" value="4"><span><b aria-hidden="true">♬♬</b>每拍 4 下</span></label>
-        </div>
-      </fieldset>
+      <div id="metroSettingsPanel">
+        <header class="metro-sheet-header">
+          <button type="button" id="metroCancel">取消</button>
+          <h2 id="metroSheetTitle">节拍设置</h2>
+          <button type="submit">确定</button>
+        </header>
+        <button type="button" id="metroOpenTempos" class="metro-tempo-entry">
+          <span>快速预设</span><span><span id="metroPresetTempo"></span> ›</span>
+        </button>
+        <fieldset>
+          <legend>拍号</legend>
+          <div class="metro-options" id="metroPresets">
+            <button type="button" data-meter="2/4">2/4</button>
+            <button type="button" data-meter="3/4">3/4</button>
+            <button type="button" data-meter="4/4">4/4</button>
+            <button type="button" data-meter="5/4">5/4</button>
+            <button type="button" data-meter="6/8">6/8</button>
+          </div>
+          <div class="metro-custom">
+            <label>分子 <select id="metroNumerator"></select></label>
+            <span aria-hidden="true">/</span>
+            <label>分母 <select id="metroDenominator"></select></label>
+          </div>
+          <p id="metroBeatUnit"></p>
+        </fieldset>
+        <fieldset>
+          <legend>拍内细分</legend>
+          <div class="metro-options metro-divisions">
+            <label><input type="radio" name="metroSubdivision" value="1"><span><b aria-hidden="true">♩</b>每拍 1 下</span></label>
+            <label><input type="radio" name="metroSubdivision" value="2"><span><b aria-hidden="true">♫</b>每拍 2 下</span></label>
+            <label><input type="radio" name="metroSubdivision" value="3"><span><b aria-hidden="true">♪♪♪</b>每拍 3 下</span></label>
+            <label><input type="radio" name="metroSubdivision" value="4"><span><b aria-hidden="true">♬♬</b>每拍 4 下</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <div id="metroTempoPanel" hidden>
+        <header class="metro-sheet-header">
+          <button type="button" id="metroBackFromTempos">‹ 返回</button>
+          <h2 id="metroTempoTitle">快速预设</h2>
+        </header>
+        <div id="metroTempoGroups" class="metro-tempo-tabs" role="group" aria-label="速度分组"></div>
+        <p class="metro-tempo-hint">速度范围仅供参考。选择后返回设置。</p>
+        <div id="metroTempoList" class="metro-tempo-list"></div>
+      </div>
     </form>
   </dialog>
 </section>
@@ -859,7 +891,11 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   const view = document.getElementById('metronomeView');
   const find = selector => view.querySelector(selector);
   const tempo = find('#metroTempo');
-  const tempoPresets = find('#metroTempoPresets');
+  const settingsPanel = find('#metroSettingsPanel');
+  const tempoPanel = find('#metroTempoPanel');
+  const tempoEntry = find('#metroOpenTempos');
+  const tempoTabs = find('#metroTempoGroups');
+  const tempoList = find('#metroTempoList');
   const presetTempo = find('#metroPresetTempo');
   const sheet = find('#metroSheet');
   const settingsButton = find('#metroSettings');
@@ -905,16 +941,61 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
       {"term":"Prestissimo","name":"最急板","min":200,"max":240,"bpm":220}
     ]}
   ];
-  find('#metroTempoGroups').innerHTML = tempoGroups.map(({label,items}) => `
-    <fieldset><legend>${label}</legend>${items.map(({term,name,min,max,bpm}) => `
-      <label class="metro-tempo-option">
+  tempoTabs.innerHTML = tempoGroups.map(({label},index) =>
+    `<button type="button" data-tempo-group="${index}" aria-pressed="false">${label}</button>`).join('');
+  let draftBpm;
+
+  function showTempoGroup(index) {
+    for (const button of tempoTabs.children) {
+      button.setAttribute('aria-pressed', String(Number(button.dataset.tempoGroup) === index));
+    }
+    tempoList.innerHTML = tempoGroups[index].items.map(({term,name,min,max,bpm}) => `
+      <button type="button" class="metro-tempo-option" data-bpm="${bpm}" aria-pressed="${bpm === draftBpm}">
         <span><strong>${term} ${name}</strong><small>参考 ${min}–${max} BPM</small></span>
         <span class="metro-tempo-value">${bpm} BPM</span>
-        <input type="radio" name="metroTempoPreset" value="${bpm}">
-      </label>`).join('')}</fieldset>`).join('');
-  tempoPresets.onchange = event => {
-    presetTempo.textContent = event.target.value + ' BPM';
+      </button>`).join('');
+    tempoList.scrollTop = 0;
+  }
+
+  function showSettingsPanel() {
+    tempoPanel.hidden = true;
+    settingsPanel.hidden = false;
+    sheet.setAttribute('aria-labelledby','metroSheetTitle');
+    presetTempo.textContent = draftBpm + ' BPM';
+    sheet.scrollTop = 0;
+  }
+
+  function backFromTempos() {
+    showSettingsPanel();
+    tempoEntry.focus();
+  }
+
+  tempoEntry.onclick = () => {
+    const index = Math.max(0,tempoGroups.findIndex(group => group.items.some(item => item.bpm === draftBpm)));
+    settingsPanel.hidden = true;
+    tempoPanel.hidden = false;
+    sheet.setAttribute('aria-labelledby','metroTempoTitle');
+    sheet.scrollTop = 0;
+    showTempoGroup(index);
+    tempoTabs.children[index].focus();
   };
+  tempoTabs.onclick = event => {
+    const button = event.target.closest('[data-tempo-group]');
+    if (button) showTempoGroup(Number(button.dataset.tempoGroup));
+  };
+  tempoList.onclick = event => {
+    const button = event.target.closest('[data-bpm]');
+    if (!button) return;
+    draftBpm = Number(button.dataset.bpm);
+    backFromTempos();
+  };
+  find('#metroBackFromTempos').onclick = backFromTempos;
+  sheet.addEventListener('cancel', event => {
+    if (!tempoPanel.hidden) {
+      event.preventDefault();
+      backFromTempos();
+    }
+  });
 
   const compound = (top, bottom) => bottom === 8 && [6, 9, 12].includes(top);
   const beatCount = () => settings.numerator / (compound(settings.numerator, settings.denominator) ? 3 : 1);
@@ -1095,11 +1176,8 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   }
 
   settingsButton.onclick = () => {
-    tempoPresets.open = false;
-    presetTempo.textContent = settings.bpm + ' BPM';
-    view.querySelectorAll('input[name="metroTempoPreset"]').forEach(input => {
-      input.checked = Number(input.value) === settings.bpm;
-    });
+    draftBpm = settings.bpm;
+    showSettingsPanel();
     numerator.value = settings.numerator;
     denominator.value = settings.denominator;
     draftCompound = compound(settings.numerator, settings.denominator);
@@ -1119,9 +1197,9 @@ if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Cell
   numerator.onchange = denominator.onchange = changeDraftMeter;
   find('#metroForm').onsubmit = event => {
     event.preventDefault();
-    const selected = find('input[name="metroTempoPreset"]:checked');
+    if (settingsPanel.hidden) return;
     update({
-      bpm: selected ? Number(selected.value) : settings.bpm,
+      bpm: draftBpm,
       numerator: Number(numerator.value),
       denominator: Number(denominator.value),
       subdivision: Number(find('input[name="metroSubdivision"]:checked').value)

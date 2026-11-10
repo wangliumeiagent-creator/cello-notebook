@@ -38,41 +38,50 @@
   <p id="metroStatus" role="status"></p>
   <dialog id="metroSheet" aria-labelledby="metroSheetTitle">
     <form id="metroForm">
-      <header class="metro-sheet-header">
-        <button type="button" id="metroCancel">取消</button>
-        <h2 id="metroSheetTitle">节拍设置</h2>
-        <button type="submit">确定</button>
-      </header>
-      <details id="metroTempoPresets" class="metro-tempo-presets">
-        <summary>快速预设 <span id="metroPresetTempo"></span></summary>
-        <p>速度术语的范围仅供参考。选择一项，再点「确定」。</p>
-        <div id="metroTempoGroups"></div>
-      </details>
-      <fieldset>
-        <legend>拍号</legend>
-        <div class="metro-options" id="metroPresets">
-          <button type="button" data-meter="2/4">2/4</button>
-          <button type="button" data-meter="3/4">3/4</button>
-          <button type="button" data-meter="4/4">4/4</button>
-          <button type="button" data-meter="5/4">5/4</button>
-          <button type="button" data-meter="6/8">6/8</button>
-        </div>
-        <div class="metro-custom">
-          <label>分子 <select id="metroNumerator"></select></label>
-          <span aria-hidden="true">/</span>
-          <label>分母 <select id="metroDenominator"></select></label>
-        </div>
-        <p id="metroBeatUnit"></p>
-      </fieldset>
-      <fieldset>
-        <legend>拍内细分</legend>
-        <div class="metro-options metro-divisions">
-          <label><input type="radio" name="metroSubdivision" value="1"><span><b aria-hidden="true">♩</b>每拍 1 下</span></label>
-          <label><input type="radio" name="metroSubdivision" value="2"><span><b aria-hidden="true">♫</b>每拍 2 下</span></label>
-          <label><input type="radio" name="metroSubdivision" value="3"><span><b aria-hidden="true">♪♪♪</b>每拍 3 下</span></label>
-          <label><input type="radio" name="metroSubdivision" value="4"><span><b aria-hidden="true">♬♬</b>每拍 4 下</span></label>
-        </div>
-      </fieldset>
+      <div id="metroSettingsPanel">
+        <header class="metro-sheet-header">
+          <button type="button" id="metroCancel">取消</button>
+          <h2 id="metroSheetTitle">节拍设置</h2>
+          <button type="submit">确定</button>
+        </header>
+        <button type="button" id="metroOpenTempos" class="metro-tempo-entry">
+          <span>快速预设</span><span><span id="metroPresetTempo"></span> ›</span>
+        </button>
+        <fieldset>
+          <legend>拍号</legend>
+          <div class="metro-options" id="metroPresets">
+            <button type="button" data-meter="2/4">2/4</button>
+            <button type="button" data-meter="3/4">3/4</button>
+            <button type="button" data-meter="4/4">4/4</button>
+            <button type="button" data-meter="5/4">5/4</button>
+            <button type="button" data-meter="6/8">6/8</button>
+          </div>
+          <div class="metro-custom">
+            <label>分子 <select id="metroNumerator"></select></label>
+            <span aria-hidden="true">/</span>
+            <label>分母 <select id="metroDenominator"></select></label>
+          </div>
+          <p id="metroBeatUnit"></p>
+        </fieldset>
+        <fieldset>
+          <legend>拍内细分</legend>
+          <div class="metro-options metro-divisions">
+            <label><input type="radio" name="metroSubdivision" value="1"><span><b aria-hidden="true">♩</b>每拍 1 下</span></label>
+            <label><input type="radio" name="metroSubdivision" value="2"><span><b aria-hidden="true">♫</b>每拍 2 下</span></label>
+            <label><input type="radio" name="metroSubdivision" value="3"><span><b aria-hidden="true">♪♪♪</b>每拍 3 下</span></label>
+            <label><input type="radio" name="metroSubdivision" value="4"><span><b aria-hidden="true">♬♬</b>每拍 4 下</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <div id="metroTempoPanel" hidden>
+        <header class="metro-sheet-header">
+          <button type="button" id="metroBackFromTempos">‹ 返回</button>
+          <h2 id="metroTempoTitle">快速预设</h2>
+        </header>
+        <div id="metroTempoGroups" class="metro-tempo-tabs" role="group" aria-label="速度分组"></div>
+        <p class="metro-tempo-hint">速度范围仅供参考。选择后返回设置。</p>
+        <div id="metroTempoList" class="metro-tempo-list"></div>
+      </div>
     </form>
   </dialog>
 </section>
