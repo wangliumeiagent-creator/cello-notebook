@@ -2,6 +2,8 @@ function createMetronome({audioReady, context, tone}) {
   const view = document.getElementById('metronomeView');
   const find = selector => view.querySelector(selector);
   const tempo = find('#metroTempo');
+  const tempoPresets = find('#metroTempoPresets');
+  const presetTempo = find('#metroPresetTempo');
   const sheet = find('#metroSheet');
   const settingsButton = find('#metroSettings');
   const numerator = find('#metroNumerator');
@@ -13,15 +15,49 @@ function createMetronome({audioReady, context, tone}) {
   const storageKey = 'cello-notebook-metronome-v1';
   const denominators = [2, 4, 8, 16];
   const subdivisions = [1, 2, 3, 4];
-  let settings = { bpm: 60, numerator: 4, denominator: 4, subdivision: 1 };
+  const defaultBpm = 60;
+  let settings = { bpm: defaultBpm, numerator: 4, denominator: 4, subdivision: 1 };
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
-    if (saved && Number.isInteger(saved.bpm) && saved.bpm >= 20 && saved.bpm <= 240
-      && Number.isInteger(saved.numerator) && saved.numerator >= 1 && saved.numerator <= 12
+    if (saved && Number.isInteger(saved.numerator) && saved.numerator >= 1 && saved.numerator <= 12
       && denominators.includes(saved.denominator) && subdivisions.includes(saved.subdivision)) {
-      settings = saved;
+      const {numerator, denominator, subdivision} = saved;
+      settings = {...settings, numerator, denominator, subdivision};
     }
   } catch {}
+
+  // Representative practice tempos from the documented reference ranges.
+  const tempoGroups = [
+    {"label":"慢速","items":[
+      {"term":"Grave","name":"庄板","min":25,"max":45,"bpm":35},
+      {"term":"Largo","name":"广板","min":40,"max":60,"bpm":50},
+      {"term":"Lento","name":"慢板","min":45,"max":60,"bpm":53},
+      {"term":"Larghetto","name":"小广板","min":60,"max":66,"bpm":63},
+      {"term":"Adagio","name":"柔板","min":66,"max":76,"bpm":71},
+      {"term":"Andante","name":"行板","min":76,"max":108,"bpm":92},
+      {"term":"Andantino","name":"小行板","min":80,"max":108,"bpm":94}
+    ]},
+    {"label":"中速","items":[
+      {"term":"Moderato","name":"中板","min":108,"max":120,"bpm":114}
+    ]},
+    {"label":"快速","items":[
+      {"term":"Allegretto","name":"小快板","min":112,"max":120,"bpm":116},
+      {"term":"Allegro","name":"快板","min":120,"max":168,"bpm":144},
+      {"term":"Vivace","name":"活板","min":168,"max":176,"bpm":172},
+      {"term":"Presto","name":"急板","min":168,"max":200,"bpm":184},
+      {"term":"Prestissimo","name":"最急板","min":200,"max":240,"bpm":220}
+    ]}
+  ];
+  find('#metroTempoGroups').innerHTML = tempoGroups.map(({label,items}) => `
+    <fieldset><legend>${label}</legend>${items.map(({term,name,min,max,bpm}) => `
+      <label class="metro-tempo-option">
+        <span><strong>${term} ${name}</strong><small>参考 ${min}–${max} BPM</small></span>
+        <span class="metro-tempo-value">${bpm} BPM</span>
+        <input type="radio" name="metroTempoPreset" value="${bpm}">
+      </label>`).join('')}</fieldset>`).join('');
+  tempoPresets.onchange = event => {
+    presetTempo.textContent = event.target.value + ' BPM';
+  };
 
   const compound = (top, bottom) => bottom === 8 && [6, 9, 12].includes(top);
   const beatCount = () => settings.numerator / (compound(settings.numerator, settings.denominator) ? 3 : 1);
@@ -135,8 +171,12 @@ function createMetronome({audioReady, context, tone}) {
     }
     const audio = playback?.audio;
     if (audio) clearSchedule();
+    const previous = settings;
     settings = {...settings, ...next};
-    try { localStorage.setItem(storageKey, JSON.stringify(settings)); } catch {}
+    const {numerator, denominator, subdivision} = settings;
+    if (previous.numerator !== numerator || previous.denominator !== denominator || previous.subdivision !== subdivision) {
+      try { localStorage.setItem(storageKey, JSON.stringify({numerator, denominator, subdivision})); } catch {}
+    }
     render();
     if (audio) schedule(audio);
   }
@@ -151,8 +191,8 @@ function createMetronome({audioReady, context, tone}) {
   });
   find('#metroSlower').onclick = () => setTempo(settings.bpm - 1);
   find('#metroFaster').onclick = () => setTempo(settings.bpm + 1);
-  view.querySelectorAll('[data-metro-tempo]').forEach(button => {
-    button.onclick = () => setTempo(Number(button.dataset.metroTempo));
+  view.querySelectorAll('[data-metro-step]').forEach(button => {
+    button.onclick = () => setTempo(settings.bpm + Number(button.dataset.metroStep));
   });
 
   find('#metroPlay').onclick = async () => {
@@ -198,6 +238,11 @@ function createMetronome({audioReady, context, tone}) {
   }
 
   settingsButton.onclick = () => {
+    tempoPresets.open = false;
+    presetTempo.textContent = settings.bpm + ' BPM';
+    view.querySelectorAll('input[name="metroTempoPreset"]').forEach(input => {
+      input.checked = Number(input.value) === settings.bpm;
+    });
     numerator.value = settings.numerator;
     denominator.value = settings.denominator;
     draftCompound = compound(settings.numerator, settings.denominator);
@@ -217,7 +262,9 @@ function createMetronome({audioReady, context, tone}) {
   numerator.onchange = denominator.onchange = changeDraftMeter;
   find('#metroForm').onsubmit = event => {
     event.preventDefault();
+    const selected = find('input[name="metroTempoPreset"]:checked');
     update({
+      bpm: selected ? Number(selected.value) : settings.bpm,
       numerator: Number(numerator.value),
       denominator: Number(denominator.value),
       subdivision: Number(find('input[name="metroSubdivision"]:checked').value)
@@ -229,9 +276,13 @@ function createMetronome({audioReady, context, tone}) {
     if (document.hidden && (pending || playback)) stop('离开页面时已停止。');
   });
   window.addEventListener('pagehide', () => stop());
+  window.addEventListener('pageshow', event => {
+    if (event.persisted && !view.hidden) setTempo(defaultBpm);
+  });
   render();
   return {
     show() {
+      if (view.hidden) setTempo(defaultBpm);
       document.body.classList.add('metronome-mode');
       view.hidden = false;
     },

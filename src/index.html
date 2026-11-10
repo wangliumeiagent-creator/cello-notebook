@@ -31,9 +31,9 @@
   </div>
   <div id="metroBeats" class="metro-beats" aria-hidden="true"></div>
   <div class="metro-controls">
-    <button type="button" class="metro-quick" data-metro-tempo="20">20 <small>BPM</small></button>
+    <button type="button" class="metro-quick" data-metro-step="-10" aria-label="降低 10 BPM">−10 <small>BPM</small></button>
     <button type="button" id="metroPlay"><span id="metroPlayIcon" aria-hidden="true">▶</span><span id="metroPlayLabel">开始</span></button>
-    <button type="button" class="metro-quick" data-metro-tempo="30">30 <small>BPM</small></button>
+    <button type="button" class="metro-quick" data-metro-step="10" aria-label="提高 10 BPM">+10 <small>BPM</small></button>
   </div>
   <p id="metroStatus" role="status"></p>
   <dialog id="metroSheet" aria-labelledby="metroSheetTitle">
@@ -43,6 +43,11 @@
         <h2 id="metroSheetTitle">节拍设置</h2>
         <button type="submit">确定</button>
       </header>
+      <details id="metroTempoPresets" class="metro-tempo-presets">
+        <summary>快速预设 <span id="metroPresetTempo"></span></summary>
+        <p>速度术语的范围仅供参考。选择一项，再点「确定」。</p>
+        <div id="metroTempoGroups"></div>
+      </details>
       <fieldset>
         <legend>拍号</legend>
         <div class="metro-options" id="metroPresets">

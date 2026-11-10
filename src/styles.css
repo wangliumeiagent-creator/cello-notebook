@@ -287,3 +287,29 @@ body.metronome-mode {
 @media (min-width: 701px) {
   .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+.metro-tempo-presets {
+  margin: 14px 16px;
+  border: 1px solid var(--metro-line);
+  border-radius: 10px;
+  background: #263a59;
+}
+.metro-tempo-presets summary { cursor: pointer; padding: 10px 12px; font-weight: 600; }
+#metroPresetTempo { float: right; color: var(--metro-cyan); font-variant-numeric: tabular-nums; }
+.metro-tempo-presets > p { margin: 0 12px; font-size: 13px; color: #c4d1ee; }
+.metro-tempo-option {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--metro-line);
+  cursor: pointer;
+  font-size: 14px;
+}
+.metro-tempo-option small { display: block; color: #c4d1ee; }
+.metro-tempo-value { white-space: nowrap; }
+.metro-tempo-option:has(:checked) { background: #1f4259; color: var(--metro-cyan); }
+.metro-tempo-option input { accent-color: var(--metro-cyan); margin: 0; }
+.metro-sheet-header { position: sticky; top: 0; z-index: 1; background: #243552; }
