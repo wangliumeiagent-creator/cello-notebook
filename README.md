@@ -45,7 +45,7 @@ Windows、Mac、iPhone 在浏览器打开同一个网站地址。iPhone 可在 S
 
 ## 首页与指板探索
 
-不带曲目 hash 的网址显示首页，可选择“练习曲”“指板探索”或第三项“读谱反应”；原有曲目链接（例如 `#song-of-the-wind`）仍会直接打开对应练习。指板探索显示 C、G、D、A 四根弦（Ⅳ、Ⅲ、Ⅱ、Ⅰ），可分别点选空弦或当前把位的四个手指落点。所选音会同步显示固定唱名、频率、弦号、把位 / 指法与低音谱号位置；试听为约 0.7 秒的 Web Audio 合成参考音，可静音或重播。
+不带曲目 hash 的网址显示首页，可选择“练习曲”“指板探索”或第三项“读谱反应”；原有曲目链接（例如 `#song-of-the-wind`）仍会直接打开对应练习。指板探索显示 C、G、D、A 四根弦（Ⅳ、Ⅲ、Ⅱ、Ⅰ），可分别点选空弦或当前把位的四个手指落点。所选音会同步显示固定唱名、频率、弦号、把位 / 指法与低音谱号位置；试听为约 0.7 秒的真人大提琴采样参考音（录音未加载时会提示并使用合成音），可静音或重播。
 
 第一版使用一个不含伸张或半把位的常规四指“全－半－全”手型。把位名称刻意细分，避免把半音格笼统称作把位：
 
@@ -91,7 +91,7 @@ npm start
 - `src/notation.js`：SVG 和 MusicXML 4.0 生成器。
 - `src/fingerboard.js`：开弦、下第二/下第三/下第四把位的教学示意数据与独立音高校验。
 - `src/app.js`：播放、辅助、打印、记录交互。
-- `scripts/build.cjs`：生成独立 HTML 与 MusicXML，不联网。会更新同名生成文件，不删除额外文件。
+- `scripts/build.cjs`：生成 HTML、MusicXML 并复制 `assets/cello` 音色包，不联网。传输或发布网页时须保留 `dist/samples/cello` 文件夹。会更新同名生成文件，不删除额外文件。
 - `scripts/serve.cjs`：本地服务器，仅绑定 127.0.0.1。
 
 修改源文件后重新构建。GitHub Pages 从 gh-pages 分支发布，main 保存完整源码。项目未启用自定义 Actions 工作流；Pages 使用 GitHub 自动生成的部署任务。修改后先构建并提交，再运行 `npm run publish`；该命令检查测试和工作区状态，推送 main，并把 dist 推送到 gh-pages。GitHub 会自动部署 gh-pages 的更新。新电脑需先配置 GitHub 的 Git 登录凭据（例如 `gh auth setup-git`）。
@@ -117,7 +117,7 @@ node tests/release.cjs
 
 浏览器脚本通过 `PLAYWRIGHT_PATH` 指向 Playwright 模块，`BROWSER_PATH` 指向 Chrome / Edge 可执行文件；默认值对应原开发电脑。先启动本地服务器。release 检查会更新 dist/scores 中每课 PDF；已有文件先保存一份 QA 备份。QA 输出和测试用记录不提交到仓库。
 
-已经进行桌面 Edge、390px 手机视口、播放和打印检查，34 份 MusicXML 通过官方 4.0 Schema 校验。没有进行真实 Mac 或 MuseScore 界面验收；用户曾在真实 iPhone 上确认关闭静音后发声，后续 audioSession 兼容逻辑已做模拟测试，但没有完整真机回归。参考音为 Web Audio 合成音，只核对音高、时值和短奏间隔，不模拟真实运弓、渐强渐弱或固定换气时间；网页进入后台会停止播放。
+已经进行桌面 Edge、390px 手机视口、播放和打印检查，34 份 MusicXML 通过官方 4.0 Schema 校验。没有进行真实 Mac 或 MuseScore 界面验收；用户曾在真实 iPhone 上确认关闭静音后发声，后续 audioSession 兼容逻辑已做模拟测试，但没有完整真机回归。参考音默认使用 Karoryfer × bigcat 的真人独奏大提琴采样（演奏者 Kamila Borowiak，CC0）；26 段录音覆盖 MIDI 36–72，相邻音移调、两种运弓交替、原循环点加短交叉淡化，按测得音高做微调。首次播放从本站加载约 10.2 MB 音色包；失败明确提示并回退合成音，下次播放重试。没有真实连奏过渡、按力度切换的采样层或自动渐强渐弱；网页进入后台会停止播放。
 
 ## 素材与范围
 

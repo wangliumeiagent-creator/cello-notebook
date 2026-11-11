@@ -142,3 +142,11 @@ gh run list --repo wangliumeiagent-creator/cello-notebook --limit 3
 ## 便携包
 
 `python scripts/package_release.py` 打包已有 dist 为版本 ZIP，不会重新构建或生成 PDF。已有同名 ZIP 时脚本拒绝覆盖；先确认版本和输出路径，不删除旧包。版本变化时同步 package.json、dist/package.json、使用说明与打包脚本；dist/使用说明.txt 要与根说明一致。
+
+## 真人大提琴采样（2026-11-11）
+
+普通开发与构建无需下载素材：CC0 音色包随 `assets/cello/` 保存，构建复制到 `dist/samples/cello/`。只复制 HTML 会丢失真人音色；本地服务器须为 `.js` 返回 JavaScript 类型，不能是带 nosniff 的二进制类型。
+
+来源、演奏者、固定版本、26 份音频的哈希和处理方法见 `assets/cello/manifest.json`，原始许可与说明一并保留。需要重现处理时，用 Python 3.10 执行 `scripts/import-cello-samples.py`（联网下载固定版本，原文件保留在忽略的 qa/，拒绝覆盖不同内容）。它保留原起音与循环点，转为单声道 PCM16/32kHz，加入短循环交叉淡化及音量匹配；播放按测得频率做细微校准。
+
+`npm test` 包含音色包完整性、音域与运弓录音检查。设置本机 `BROWSER_PATH` 后运行 `node tests/sample-browser.cjs`，无需额外 Node 依赖：验证四页面实际采样播放、暂停/继续、加载取消、素材缺失回退、file:// 加载、长音循环和提前停止，并在 qa/ 导出带时间戳的 WAV 试听。该检查用临时本地服务和独立的无界面浏览器，不等于真实 iPhone 验收；不发布网站。
