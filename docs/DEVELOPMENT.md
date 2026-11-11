@@ -150,3 +150,7 @@ gh run list --repo wangliumeiagent-creator/cello-notebook --limit 3
 来源、演奏者、固定版本、26 份音频的哈希和处理方法见 `assets/cello/manifest.json`，原始许可与说明一并保留。需要重现处理时，用 Python 3.10 执行 `scripts/import-cello-samples.py`（联网下载固定版本，原文件保留在忽略的 qa/，拒绝覆盖不同内容）。它保留原起音与循环点，转为单声道 PCM16/32kHz，加入短循环交叉淡化及音量匹配；播放按测得频率做细微校准。
 
 `npm test` 包含音色包完整性、音域与运弓录音检查。设置本机 `BROWSER_PATH` 后运行 `node tests/sample-browser.cjs`，无需额外 Node 依赖：验证四页面实际采样播放、暂停/继续、加载取消、素材缺失回退、file:// 加载、长音循环和提前停止，并在 qa/ 导出带时间戳的 WAV 试听。该检查用临时本地服务和独立的无界面浏览器，不等于真实 iPhone 验收；不发布网站。
+
+## 与微信小程序协同开发
+
+必读 [双端开发规范](CROSS_PLATFORM_DEVELOPMENT.md)。曲目、音高节奏和通用功能变更必须核对独立小程序仓库 cello-miniprogram，记录同步修改/已一致/平台专属结论。小程序曲库由本仓库已提交源码生成；网页部署与微信上传分别验证，互不代替。

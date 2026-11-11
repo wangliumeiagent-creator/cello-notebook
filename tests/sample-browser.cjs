@@ -23,6 +23,14 @@ async function main(){
  async function evaluate(expression){const res=await send('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(res.error||res.result.exceptionDetails)throw Error(JSON.stringify(res));return res.result.result.value;}
  async function until(expression){for(let i=0;i<200;i++){try{if(await evaluate(expression))return;}catch{}await wait(40);}throw Error('Timeout: '+expression);}
  async function navigate(url){await send('Page.navigate',{url});await until("document.readyState==='complete'&&typeof CelloAudio==='object'");}
+ await navigate(origin+'/index.html#metronome');
+ assert.equal(await evaluate("CelloApp.view()"),'metronome');
+ await evaluate("globalThis.metroSources=new Set();const originalOscillator=AudioContext.prototype.createOscillator;AudioContext.prototype.createOscillator=function(){const node=originalOscillator.call(this);metroSources.add(node);node.addEventListener('ended',()=>metroSources.delete(node),{once:true});return node;};document.querySelector('#metroPlay').click()");await until("metroSources.size>0&&CelloApp.audioState()==='running'");
+ assert.equal(requests.filter(u=>u.endsWith('/pack.js')).length,0,'Metronome must not load cello recordings');
+ await evaluate("document.querySelector('#metroPlay').click()");await until('metroSources.size===0');
+ assert.equal(await evaluate("document.querySelector('#metroPlayLabel').textContent"),'开始');
+ assert(await evaluate("!!document.querySelector('.home-card[href=\"#metronome\"]')&&!!document.querySelector('.home-brand img[src=\"cello-icon-v3.png\"]')"));
+ console.log('Merged metronome, home navigation and logo: OK');
  for(const file of ['index.html#practice','sight-reading.html','game.html','game-demo.html']){
   await navigate(origin+'/'+file);
   await evaluate(`globalThis.sampleCalls=0;const originalVoice=CelloAudio.play;CelloAudio.play=(...args)=>{const voice=originalVoice(...args);if(voice.kind==='sampled')sampleCalls++;return voice;};`);

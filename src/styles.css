@@ -54,3 +54,288 @@ button:hover,.button:hover{background:#eef4e8}
  .library-group-links .nav-link{white-space:normal;padding:6px 9px}
  .home-view{padding-top:20px}.home-cards{grid-template-columns:1fr}.fingerboard-layout{grid-template-columns:1fr}.fingerboard-strings{min-height:500px;gap:6px;padding-inline:3px}.fingerboard-string{min-height:460px}.finger-point{width:66px;min-height:46px;font-size:11px}.finger-point strong{font-size:18px}.finger-point span{font-size:10px}.position-zone{width:44px}.fingerboard-card{padding:15px 8px}.position-controls button{padding:7px 9px;font-size:13px}
 }
+
+/* Standalone metronome */
+body.metronome-mode {
+  color-scheme: dark;
+  background: radial-gradient(ellipse at 50% 38%, #1c2a4c, #101526 55%);
+  color: #f1f5ff;
+}
+.metronome-mode main { padding: 0 16px; }
+#metronomeView {
+  --metro-line: #4b6089;
+  --metro-cyan: #6ee4ff;
+  width: min(100%, 460px);
+  margin: auto;
+  padding: max(16px, env(safe-area-inset-top)) 0 max(16px, env(safe-area-inset-bottom));
+  text-align: center;
+}
+.metro-header { position: relative; margin-bottom: 16px; }
+.metro-header h1 { margin: 0; font-size: 23px; line-height: 44px; font-weight: 600; }
+.metro-header a {
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #c4d1ee;
+  text-decoration: none;
+  font-size: 26px;
+}
+.metro-header a:hover { background: #273653; }
+#metroSettings {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  width: 100%;
+  padding: 0;
+  border-radius: 30px;
+  border-color: var(--metro-line);
+  background: #1c2844;
+  color: #e3ebff;
+}
+#metroSettings:hover { background: #28395b; }
+#metroSettings span { line-height: 46px; }
+#metroSettings > span + span { border-left: 1px solid #394968; }
+.metro-dial {
+  container-type: inline-size;
+  width: min(100%, 388px, max(236px, 52svh));
+  aspect-ratio: 1;
+  margin: clamp(24px, 6vh, 60px) auto 22px;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(from 15deg, #67e1ff, #63599a 25%, #65e1ff 54%, #56548e 76%, #67e1ff);
+  box-shadow: 0 0 44px #377bcc55, inset 0 0 12px #edfaff90;
+}
+.metro-dial::before {
+  content: '';
+  position: absolute;
+  inset: 2.8%;
+  border: 1px solid #2c3954;
+  border-radius: 50%;
+  background: #121827;
+  box-shadow: inset 0 0 0 6px #0c101b;
+}
+.metro-dial::after {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from -.3deg, #77dfff 0deg .62deg, #142535 .7deg 3deg);
+}
+.metro-dial-light {
+  --light: #bc287e;
+  position: absolute;
+  z-index: 1;
+  inset: 7%;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 49%, var(--light) 53% 69%, transparent 72%);
+  box-shadow: inset 0 0 18px var(--light);
+  opacity: 0;
+  pointer-events: none;
+}
+.metro-dial-light.is-accent { --light: #d77919; }
+.metro-dial-light[data-side=left] { clip-path: inset(0 50% 0 0); }
+.metro-dial-light[data-side=right] { clip-path: inset(0 0 0 50%); }
+@media (prefers-reduced-motion: reduce) {
+  .metro-dial-light { display: none; }
+}
+.metro-face {
+  z-index: 2;
+  width: 66%;
+  aspect-ratio: 1;
+  border: 1px solid #586588;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  background: linear-gradient(165deg, #414b70, #1a2138 72%);
+  box-shadow: 0 0 0 6px #101626, inset 0 0 0 4px #323b58;
+}
+.metro-face label { color: #c4d1ee; font-size: 13px; letter-spacing: .16em; }
+.metro-tempo { display: flex; align-items: center; justify-content: center; }
+.metro-tempo button {
+  width: clamp(36px, 13cqw, 44px);
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border-color: #627092;
+  background: #35425f;
+  color: #fff;
+  font-size: 23px;
+  line-height: 1;
+}
+.metro-tempo button:hover { background: #4b5e82; }
+#metroTempo {
+  width: 2.12em;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #fff;
+  text-align: center;
+  font-size: clamp(30px, 14cqw, 56px);
+  line-height: 1.3;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.metro-beats { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 27px; }
+.metro-beats span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  min-width: 0;
+  aspect-ratio: 1;
+  border: 1px solid var(--metro-line);
+  border-radius: 50%;
+  background: #202c48;
+  color: #c5d1eb;
+  font-size: 11px;
+}
+.metro-beats span:first-child { border-color: #8e7c60; color: #ffd28c; }
+.metro-beats .is-current { background: var(--metro-cyan); border-color: var(--metro-cyan); color: #101526; }
+.metro-beats .is-current:first-child { background: #ffc371; border-color: #ffc371; color: #241509; }
+.metro-controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  margin: clamp(16px, 4vh, 34px) auto 0;
+  max-width: 360px;
+}
+#metroPlay {
+  width: 84px;
+  height: 84px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  background: linear-gradient(140deg, #ffb05a, #ff7547 60%, #f1513f);
+  color: #231011;
+  font-weight: 700;
+  line-height: 1.2;
+}
+#metroPlay:hover { background: #ffab65; }
+#metroPlayIcon { font-size: 27px; }
+.metro-quick {
+  min-height: 44px;
+  border-radius: 24px;
+  border-color: var(--metro-line);
+  background: #1c2844;
+  color: #e3ebff;
+}
+.metro-quick:hover { background: #28395b; }
+.metro-quick small { font-size: 10px; }
+#metroStatus { min-height: 20px; font-size: 13px; color: #c4d1ee; }
+#metroSheet {
+  position: fixed;
+  inset: auto 0 0;
+  margin: 0 auto;
+  width: min(100%, 540px);
+  max-width: none;
+  max-height: 90vh;
+  padding: 0 0 max(12px, env(safe-area-inset-bottom));
+  border: 1px solid var(--metro-line);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  background: #243552;
+  color: #f1f5ff;
+  text-align: left;
+  box-shadow: 0 -12px 48px #0a101c66;
+}
+#metroSheet::backdrop { background: #050811b8; }
+.metro-sheet-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--metro-line);
+}
+.metro-sheet-header h2 { margin: 0; }
+.metro-sheet-header button { justify-self: start; min-height: 44px; border: 0; background: none; color: #c4d1ee; }
+.metro-sheet-header button:last-child { justify-self: end; color: var(--metro-cyan); font-weight: 700; }
+.metro-sheet-header button:hover { background: #394b6b; }
+#metroSheet fieldset { margin: 17px 16px; padding: 0; border: 0; min-width: 0; }
+#metroSheet legend { padding: 0 0 9px; font-weight: 600; }
+.metro-options { display: flex; flex-wrap: wrap; gap: 7px; }
+.metro-options button, .metro-options label > span {
+  min-height: 44px;
+  padding: 7px 10px;
+  border: 1px solid var(--metro-line);
+  border-radius: 9px;
+  color: #ecf3ff;
+  background: #304463;
+  text-align: center;
+}
+.metro-options button:hover, .metro-options label:hover > span { background: #3a5378; }
+.metro-options button[aria-pressed=true], .metro-options input:checked + span {
+  border-color: var(--metro-cyan);
+  color: var(--metro-cyan);
+  background: #1f4259;
+}
+.metro-custom { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; }
+.metro-custom select { min-height: 44px; border-color: var(--metro-line); background: #304463; color: #ecf3ff; }
+#metroBeatUnit { font-size: 13px; color: #c4d1ee; }
+.metro-divisions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.metro-divisions label { position: relative; cursor: pointer; }
+.metro-divisions input { position: absolute; opacity: 0; }
+.metro-divisions input:focus-visible + span { outline: 3px solid #ffc371; outline-offset: 2px; }
+.metro-divisions label > span { display: block; font-size: 12px; padding-inline: 2px; }
+.metro-divisions b { display: block; font-size: 20px; font-weight: 400; }
+@media (min-width: 701px) {
+  .home-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.metro-tempo-entry, .metro-tempo-tabs button, .metro-tempo-option {
+  border: 1px solid var(--metro-line);
+  background: #263a59;
+  color: #f1f5ff;
+}
+.metro-tempo-entry:hover, .metro-tempo-tabs button:hover, .metro-tempo-option:hover {
+  background: #30476b;
+}
+.metro-tempo-entry {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 32px);
+  min-height: 44px;
+  margin: 14px 16px 0;
+  text-align: left;
+  font-weight: 600;
+}
+.metro-tempo-entry > span:last-child { color: var(--metro-cyan); font-variant-numeric: tabular-nums; }
+#metroTempoPanel .metro-sheet-header button { justify-self: start; }
+.metro-tempo-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin: 12px 16px 6px; }
+.metro-tempo-tabs button { min-height: 44px; }
+.metro-tempo-hint { margin: 0 16px 6px; font-size: 13px; color: #c4d1ee; }
+.metro-tempo-list {
+  display: grid;
+  gap: 5px;
+  max-height: 42vh;
+  max-height: 42dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 16px 8px;
+}
+.metro-tempo-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-height: 50px;
+  padding: 5px 8px;
+  text-align: left;
+}
+.metro-tempo-option small { display: block; color: #c4d1ee; }
+.metro-tempo-value { white-space: nowrap; }
+.metro-tempo-tabs button[aria-pressed=true], .metro-tempo-option[aria-pressed=true] {
+  background: #1f4259;
+  color: var(--metro-cyan);
+  border-color: var(--metro-cyan);
+}
+.metro-sheet-header { position: sticky; top: 0; z-index: 1; background: #243552; }
+
+.home-brand { display: flex; align-items: center; gap: 10px; }
+.home-brand img { display: block; border-radius: 12px; }

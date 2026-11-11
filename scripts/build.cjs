@@ -5,7 +5,7 @@ for(const lesson of lib.lessons)core.validateLesson(lesson);
 fs.mkdirSync(out,{recursive:true});fs.mkdirSync(path.join(out,'scores'),{recursive:true});
 const src=name=>fs.readFileSync(path.join(ROOT,'src',name),'utf8');
 const font=fs.readFileSync(path.join(ROOT,'assets','Bravura.otf')).toString('base64');
-const html=src('index.html').replace('__CSS__',src('styles.css').replace('__FONT__',font)).replace('__LAPUTA__',src('laputa.js')).replace('__ADVANCED__',src('advanced.js')).replace('__SCARS__',src('scars.js')+src('c-major.js')).replace('__LIBRARY__',src('library.js')).replace('__CORE__',src('core.js')).replace('__NOTATION__',src('notation.js')).replace('__FINGERBOARD__',src('fingerboard.js')).replace('__AUDIO__',src('audio.js')).replace('__APP__',src('app.js'));
+const html=src('index.html').replace('__CSS__',src('styles.css').replace('__FONT__',font)).replace('__LAPUTA__',src('laputa.js')).replace('__ADVANCED__',src('advanced.js')).replace('__SCARS__',src('scars.js')+src('c-major.js')).replace('__LIBRARY__',src('library.js')).replace('__CORE__',src('core.js')).replace('__NOTATION__',src('notation.js')).replace('__FINGERBOARD__',src('fingerboard.js')).replace('__METRONOME__',src('metronome.js')).replace('__AUDIO__',src('audio.js')).replace('__APP__',src('app.js'));
 fs.writeFileSync(path.join(out,'index.html'),html);
 fs.writeFileSync(path.join(out,'sight-reading.html'),src('sight-reading.html').replace('<script src="audio.js"></script>','<script>'+src('audio.js')+'</script>'));
 // Keep the game tied to the same score data; emit a self-contained local demo.
@@ -16,4 +16,5 @@ for(const lesson of lib.lessons)for(const answer of [false,true])fs.writeFileSyn
 fs.copyFileSync(path.join(ROOT,'assets','Bravura-LICENSE.txt'),path.join(out,'Bravura-LICENSE.txt'));
 fs.copyFileSync(path.join(ROOT,'assets','cello-icon.svg'),path.join(out,'cello-icon.svg'));
 fs.cpSync(path.join(ROOT,'assets','cello'),path.join(out,'samples','cello'),{recursive:true});
+fs.copyFileSync(path.join(ROOT,'assets','cello-icon-v3.png'),path.join(out,'cello-icon-v3.png'));
 console.log(`Built ${lib.lessons.length} lessons into ${out}`);
