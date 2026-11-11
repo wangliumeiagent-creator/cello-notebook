@@ -1240,7 +1240,7 @@ const contexts=new WeakMap();
 const instruments=new WeakMap();let packRequest=null;
 function notify(state){
  if(typeof document==='undefined')return;
- const labels={loading:'正在准备真实大提琴录音…',sampled:'音色：真实大提琴录音 · Karoryfer × bigcat',fallback:'音色：合成参考音（录音未能加载，下次播放将重试）'};
+ const labels={loading:'正在准备真实大提琴录音…首次需加载约 10 MB，请稍候。',sampled:'音色：真实大提琴录音 · Karoryfer × bigcat',fallback:'音色：合成参考音（录音未能加载，下次播放将重试）'};
  document.querySelectorAll('[data-audio-status]').forEach(el=>{el.textContent=labels[state];});
 }
 function loadPack(){
@@ -1251,7 +1251,7 @@ function loadPack(){
   const finish=error=>{clearTimeout(timer);script.onload=script.onerror=null;if(error){script.remove();packRequest=null;reject(error);}else resolve(root.CelloSamplePack);};
   script.src=new URL('samples/cello/pack.js',document.baseURI).href;script.async=true;
   script.onload=()=>finish(root.CelloSamplePack?null:Error('录音包无效'));
-  script.onerror=()=>finish(Error('录音包不可用'));timer=setTimeout(()=>finish(Error('录音加载超时')),12000);
+  script.onerror=()=>finish(Error('录音包不可用'));timer=setTimeout(()=>finish(Error('录音加载超时')),60000);
   document.head.append(script);
  });return packRequest;
 }
