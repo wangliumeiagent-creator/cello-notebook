@@ -41,6 +41,11 @@ async function main(){
   }else{await evaluate("document.querySelector('#start').click()");await until('running&&initialized');await evaluate('tone(50,.15)');assert(await evaluate('sampleCalls>0'));await evaluate('pause()');assert.equal(await evaluate('running'),false);}
   assert((await evaluate("document.querySelector('[data-audio-status]').textContent")).includes('真实大提琴录音'));console.log(file+': sampled playback OK');
  }
+ await navigate(origin+'/index.html#practice');
+ await evaluate(`globalThis.loadingContext=null;const prepareBeforeInterruption=CelloAudio.prepare;CelloAudio.prepare=async ctx=>{loadingContext=ctx;const ready=await prepareBeforeInterruption(ctx);await ctx.suspend();return ready;};document.querySelector('#countIn').checked=false;document.querySelector('#play').click();`);
+ await until("CelloApp.playbackState()==='playing'&&loadingContext.state==='running'");
+ await evaluate("document.querySelector('#stop').click()");
+ console.log('Audio channel interrupted during sample preparation: resumed before playback');
  await navigate(origin+'/slow/index.html#practice');await evaluate("document.querySelector('#play').click();document.querySelector('#stop').click()");await wait(1000);assert.equal(await evaluate('CelloApp.playbackState()'),'stopped');console.log('Cancel while loading: OK');
  await navigate(origin+'/missing/index.html#practice');await evaluate("document.querySelector('#countIn').checked=false;document.querySelector('#play').click()");await until("CelloApp.playbackState()==='playing'");assert((await evaluate("document.querySelector('[data-audio-status]').textContent")).includes('合成参考音'));await evaluate("document.querySelector('#stop').click()");console.log('Missing recordings: explicit synthesis fallback OK');
  await navigate(origin+'/index.html#practice');

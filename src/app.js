@@ -41,16 +41,23 @@ function loadLesson(next){if(initialized)drafts.set(current.id,{note:$('#recordN
  document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.hash==='#'+current.id));document.querySelectorAll('[data-library-group]').forEach(g=>g.open=g.dataset.libraryGroup===groupForLesson(current));$('#playerStatus').textContent='先读谱、拍节奏，再播放核对；读谱页按空格可播放或暂停。';renderScore();renderRecords();$('#printRoot').innerHTML=printHtml();}
 let ctx=null,activeNodes=new Set(),run=null,paused=null,frame=null,generation=0,audioNeedsReset=false,lastAudioReadyAt=0;const AUDIO_STALE_MS=15*60*1000;
 async function resetAudio(){const previous=ctx;ctx=null;audioNeedsReset=false;lastAudioReadyAt=0;if(!previous||previous.state==='closed')return;let timeout;try{await Promise.race([previous.close(),new Promise(resolve=>{timeout=setTimeout(resolve,350);})]);}catch{}finally{clearTimeout(timeout);}}
+async function ensureAudioRunning(audio){
+ if(audio.state!=='running'){let timeout;try{await Promise.race([audio.resume(),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('音频尚未启动，请再次点击播放。')),5000);})]);}finally{clearTimeout(timeout);}}
+ if(audio.state!=='running')throw Error('音频被系统暂停，请再次点击播放。');
+}
 async function audioReady({samples=true}={}){
  // Request the media playback channel before creating/resuming audio in the click handler.
  // Unsupported browsers keep their normal Web Audio behavior.
  try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch{}
  if(audioNeedsReset||(ctx&&lastAudioReadyAt&&Date.now()-lastAudioReadyAt>AUDIO_STALE_MS))await resetAudio();
  if(!ctx||ctx.state==='closed'){const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('当前浏览器不支持音频，请使用 Safari 打开。');ctx=new Audio();}
- if(ctx.state!=='running'){let timeout;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('音频尚未启动，请用 Safari 打开后再次点击播放。')),5000);})]);}finally{clearTimeout(timeout);}}
- if(ctx.state!=='running')throw Error('音频被系统暂停，请再次点击播放。');
+ await ensureAudioRunning(ctx);
  const active=ctx;active.onstatechange=()=>{if(ctx===active&&active.state!=='running'&&active.state!=='closed')audioNeedsReset=true;};audioNeedsReset=false;lastAudioReadyAt=Date.now();
- if(samples)await CelloAudio.prepare(active);
+ if(samples){
+  await CelloAudio.prepare(active);
+  if(ctx!==active||document.hidden)throw Error('音频准备已中断，请再次点击播放。');
+  await ensureAudioRunning(active);
+ }
 }
 function tone(hz,start,duration,click=false){if(!click){const voice=CelloAudio.play(ctx,hz,start,duration);activeNodes.add(voice);voice.onended=()=>activeNodes.delete(voice);return voice;}const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=click?'sine':'triangle';osc.frequency.value=hz;const end=start+duration;gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(click?.10:.13,start+.007);gain.gain.setValueAtTime(click?.08:.11,Math.max(start+.008,end-.025));gain.gain.linearRampToValueAtTime(0,end);osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(end+.01);activeNodes.add(osc);osc.onended=()=>{activeNodes.delete(osc);osc.disconnect();gain.disconnect();};return osc;}
 function clearActive(keepLine=false){document.querySelectorAll('.note-event.active').forEach(e=>e.classList.remove('active'));if(!keepLine)document.querySelectorAll('.score-line.playing').forEach(e=>e.classList.remove('playing'));}
@@ -59,7 +66,7 @@ function stop(message=true){generation++;if(frame)cancelAnimationFrame(frame);fr
 function pause(){if(!run)return;const r=run,offset=Math.max(0,Math.min(r.plan.duration,ctx.currentTime-r.start));generation++;if(frame)cancelAnimationFrame(frame);frame=null;run=null;for(const n of activeNodes)try{n.stop();}catch(e){}activeNodes.clear();paused={...r,offset};$('#play').textContent='▶ 继续播放';$('#playerStatus').textContent='已暂停；按空格或“继续播放”继续。';}
 async function resume(){if(!paused)return play();const saved=paused,token=generation;try{await audioReady();if(token!==generation)return;}catch(e){$('#playerStatus').textContent=e.message||'请点击重试音频。';return;}const nextAfter=(items,offset)=>{const index=items.findIndex(e=>e.time>offset);return index<0?items.length:index;},offset=saved.offset;paused=null;run={...saved,start:ctx.currentTime-offset,nextNote:nextAfter(saved.plan.entries,offset),nextClick:nextAfter(saved.plan.clicks,offset),last:saved.plan.entries.findLastIndex(e=>e.time<=offset)};const sounding=saved.melody&&saved.plan.entries.findLast(e=>e.pitch&&!e.continuation&&e.time<=offset&&offset<e.time+(e.sustain||e.duration));if(sounding){const held=(sounding.sustain||sounding.duration)*(sounding.articulation==='staccato'?.55:.94),remaining=held-(offset-sounding.time);if(remaining>.03)tone(C.pitchInfo(sounding.pitch).hz,ctx.currentTime+.03,remaining);}$('#play').textContent='暂停';$('#playerStatus').textContent='继续播放…';pump();}
 async function singleNote(pitch){stop(false);if(!pitch){$('#playerStatus').textContent='休止符：保持安静，但继续数拍。';return;}const token=generation;try{await audioReady();if(token!==generation)return;const p=C.pitchInfo(pitch);tone(p.hz,ctx.currentTime+.03,.7);$('#playerStatus').textContent='单音试听：'+p.name;}catch(e){$('#playerStatus').textContent='音频未能启动，请再点击一次。';}}
-async function play(){if(paused){resume();return;}if(!validSelection())return;stop(false);const token=generation;let plan;try{plan=C.timeline(current,{...selection(),tempo:Number($('#tempo').value),countIn:$('#countIn').checked,repeat:$('#repeat').checked});await audioReady();if(token!==generation)return;}catch(e){$('#playerStatus').textContent=e.message||'请点击重试音频。';return;}
+async function play(){if(paused){resume();return;}if(!validSelection())return;stop(false);const token=generation;$('#playerStatus').textContent='正在准备声音…';let plan;try{plan=C.timeline(current,{...selection(),tempo:Number($('#tempo').value),countIn:$('#countIn').checked,repeat:$('#repeat').checked});await audioReady();if(token!==generation)return;}catch(e){$('#playerStatus').textContent=e.message||'请点击重试音频。';return;}
  run={plan,start:ctx.currentTime+.08,nextNote:0,nextClick:0,last:-1,activeLine:null,loop:$('#loop').checked,click:$('#metronome').checked,melody:$('#playbackMode').value==='music',cycle:0};$('#play').textContent='暂停';$('#playerStatus').textContent=run.melody?'准备播放…':'仅节拍：跟随谱面拉奏…';pump();}
 function pump(){if(!run)return;const r=run,now=ctx.currentTime,horizon=now+.18;
  while(r.nextNote<r.plan.entries.length&&r.start+r.plan.entries[r.nextNote].time<horizon){const e=r.plan.entries[r.nextNote++];if(r.melody&&e.pitch&&!e.continuation)tone(C.pitchInfo(e.pitch).hz,Math.max(now,r.start+e.time),Math.max(.03,(e.sustain||e.duration)*(e.articulation==='staccato'?.55:.94)));}

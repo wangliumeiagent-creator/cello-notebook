@@ -5,7 +5,7 @@ const contexts=new WeakMap();
 const instruments=new WeakMap();let packRequest=null;
 function notify(state){
  if(typeof document==='undefined')return;
- const labels={loading:'正在准备真实大提琴录音…首次需加载约 10 MB，请稍候。',sampled:'音色：真实大提琴录音 · Karoryfer × bigcat',fallback:'音色：合成参考音（录音未能加载，下次播放将重试）'};
+ const labels={loading:'正在准备真实大提琴录音…首次需加载约 10 MB，请稍候。',sampled:'音色：真实大提琴录音 · Karoryfer × bigcat',fallback:'音色：合成参考音（录音尚未就绪，下次播放将重试）'};
  document.querySelectorAll('[data-audio-status]').forEach(el=>{el.textContent=labels[state];});
 }
 function loadPack(){
@@ -22,19 +22,30 @@ function loadPack(){
 }
 async function prepare(ctx){
  let state=instruments.get(ctx);
- if(state?.ready){notify('sampled');return true;}if(state?.pending)return state.pending;
- state={ready:false,voices:new Set(),roundRobin:new Map()};instruments.set(ctx,state);notify('loading');
- state.pending=(async()=>{try{
-  const pack=await loadPack();
-  const decoded=await Promise.all(pack.samples.map(async sample=>{
-   const bytes=Uint8Array.from(atob(sample.data),c=>c.charCodeAt(0));
-   const buffer=await ctx.decodeAudioData(bytes.buffer);
-   if(!(sample.loopStart>=0&&sample.loopEnd>sample.loopStart&&sample.loopEnd<=buffer.duration+.001))throw Error('录音循环点无效');
-   return {...sample,data:undefined,buffer};
-  }));
-  state.samples=decoded;state.ready=true;notify('sampled');return true;
- }catch(e){state.ready=false;notify('fallback');return false;}finally{state.pending=null;}})();
- return state.pending;
+ if(!state){state={ready:false,voices:new Set(),roundRobin:new Map()};instruments.set(ctx,state);}
+ if(state.ready||state.samples){state.ready=true;notify('sampled');return true;}
+ if(!state.pending){
+  state.pending=(async()=>{try{
+   const pack=await loadPack();
+   const decoded=[];
+   // Decode in sequence to bound peak memory on phones.
+   for(const sample of pack.samples){
+    const bytes=Uint8Array.from(atob(sample.data),c=>c.charCodeAt(0));
+    const buffer=await ctx.decodeAudioData(bytes.buffer);
+    if(!(sample.loopStart>=0&&sample.loopEnd>sample.loopStart&&sample.loopEnd<=buffer.duration+.001))throw Error('录音循环点无效');
+    decoded.push({...sample,data:undefined,buffer});
+   }
+   state.samples=decoded;return true;
+  }catch(e){return false;}finally{state.pending=null;}})();
+ }
+ notify('loading');
+ let timer;
+ try{
+  // A slow or stalled download/decoder must not indefinitely block practice.
+  // Keep the background request for the next tap, without changing timbre mid-phrase.
+  const ready=await Promise.race([state.pending,new Promise(resolve=>{timer=setTimeout(()=>resolve(false),8000);})]);
+  state.ready=ready;notify(ready?'sampled':'fallback');return ready;
+ }finally{clearTimeout(timer);}
 }
 function sampled(ctx,state,hz,start,duration){
  const midi=69+12*Math.log2(hz/440);
