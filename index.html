@@ -344,7 +344,7 @@ body.metronome-mode {
 <main><section id="homeView" class="home-view" aria-labelledby="homeTitle"><div class="eyebrow home-brand"><img src="cello-icon-v3.png" width="52" height="52" alt=""><span>大提琴学习伴侣</span></div><h1 id="homeTitle">今天，从哪里开始？</h1><p class="home-intro">选择一项，开始今天的练习。</p><div class="home-cards"><a class="home-card" href="#practice"><span class="home-icon" aria-hidden="true">♫</span><h2>练习曲</h2><p>看谱、听示范、按曲练习。</p><span>进入练习曲 →</span></a><a class="home-card" href="#fingerboard"><span class="home-icon" aria-hidden="true">⌁</span><h2>指板探索</h2><p>认识四弦、把位、音高与谱位。</p><span>进入指板探索 →</span></a><a class="home-card" href="sight-reading.html"><span class="home-icon" aria-hidden="true">♩</span><h2>读谱反应</h2><p>看谱找弦与手指，逐步撤掉提示，再拿琴练短句。</p><span>进入读谱反应 →</span></a><a class="home-card" href="game.html"><span class="home-icon" aria-hidden="true">♬</span><h2>读谱游戏</h2><p>左手按住指法，右手选弦拉弓，跟随谱面练习。</p><span>进入读谱游戏 →</span></a><a class="home-card" href="#metronome"><span class="home-icon" aria-hidden="true">♩</span><h2>节拍器</h2><p>设定速度和拍号，按自己的节奏练琴。</p><span>进入节拍器 →</span></a></div><p class="muted">试听优先使用真实大提琴录音；具体换把与手型请继续以老师建议为准。</p></section>
 <section id="lessonView" hidden><header class="lesson-header"><div><a class="back-home" href="#home">← 返回首页</a><div class="eyebrow" id="lessonKind"></div><h1 id="title"></h1><p id="description"></p></div><div class="header-actions"><button id="print">打印 / PDF</button></div></header>
 <div class="chips" id="chips"></div>
-<section class="player card" aria-label="播放控制"><div class="control-row"><button id="play" class="primary" aria-keyshortcuts="Space">▶ 播放</button><button id="stop">停止</button><label>速度 <select id="tempo" aria-label="速度"></select><span class="unit">拍/分钟</span></label><span class="separator"></span><label>小节 <select id="from" aria-label="起始小节"></select> 至 <select id="to" aria-label="结束小节"></select></label><button id="whole">全曲</button></div><div class="control-row secondary"><label>播放内容 <select id="playbackMode" aria-label="播放内容"><option value="music">音乐 + 节拍</option><option value="beats">仅节拍</option></select></label><label><input type="checkbox" id="countIn" checked>预备拍</label><label><input type="checkbox" id="metronome">节拍声</label><label><input type="checkbox" id="followScore" checked>播放时自动跟谱</label><label><input type="checkbox" id="loop">循环所选小节</label><label id="repeatLabel"><input type="checkbox" id="repeat" checked>按谱反复（仅全曲）</label></div><p id="playerStatus" role="status" aria-live="polite">先读谱、拍节奏，再播放核对；读谱页按空格可播放或暂停。</p><div class="progress-track"><div id="progress"></div></div></section>
+<section class="player card" aria-label="播放控制"><div class="control-row"><button id="play" class="primary" aria-keyshortcuts="Space">▶ 播放</button><button id="stop">停止</button><label>速度 <select id="tempo" aria-label="速度"></select><span class="unit">拍/分钟</span></label><span class="separator"></span><label>小节 <select id="from" aria-label="起始小节"></select> 至 <select id="to" aria-label="结束小节"></select></label><button id="whole">全曲</button></div><div class="control-row secondary"><label>播放内容 <select id="playbackMode" aria-label="播放内容"><option value="music">音乐 + 节拍</option><option value="beats">仅节拍</option></select></label><label><input type="checkbox" id="countIn" checked>预备拍</label><label><input type="checkbox" id="metronome">节拍声</label><label><input type="checkbox" id="followScore" checked>播放时自动跟谱</label><label><input type="checkbox" id="loop">循环所选小节</label><label id="repeatLabel"><input type="checkbox" id="repeat" checked>按谱反复（仅全曲）</label></div><p class="muted" data-audio-status role="status">音色：真实大提琴录音，首次播放时加载。</p><p id="playerStatus" role="status" aria-live="polite">先读谱、拍节奏，再播放核对；读谱页按空格可播放或暂停。</p><div class="progress-track"><div id="progress"></div></div></section>
 <div class="tabs" role="tablist" aria-label="学习视图"><button role="tab" aria-selected="true" aria-controls="scorePanel" data-tab="scorePanel">读谱练习</button><button role="tab" aria-selected="false" aria-controls="theoryPanel" data-tab="theoryPanel">本课乐理</button><button role="tab" aria-selected="false" aria-controls="recordsPanel" data-tab="recordsPanel">练习记录 <span id="recordCount">0</span></button></div>
 <section id="scorePanel" role="tabpanel"><div class="score-toolbar"><div class="toggles"><span>辅助提示</span><label><input type="checkbox" data-layer="names">音名</label><label><input type="checkbox" data-layer="fingering">弦名 / 指法</label><label><input type="checkbox" data-layer="jianpu">简谱</label><label><input type="checkbox" data-layer="bows" checked>教材弓法</label></div><div><button id="answers">显示辅助</button><button id="hideAnswers">独立读谱</button></div></div><div id="phrases" class="phrases"></div><div class="card score-card"><div class="score-heading"><strong id="scoreHeading"></strong><span>点击音符听单音</span></div><div id="score"></div></div><div class="practice-notes card"><h2>这次练什么</h2><ul id="tips"></ul><p class="muted">播放使用真人大提琴采样，用于核对音高与时值；录音加载失败时会提示并使用合成参考音。练琴时可以关闭网页节拍声，继续使用机械节拍器。</p></div><p class="source" id="source"></p></section>
 <section id="theoryPanel" role="tabpanel" hidden><div id="theory"></div><div class="card"><h2>三个数字，先分清楚</h2><p>谱上“弦 / 指”中的 Ⅰ–Ⅳ 依次代表 A、D、G、C 弦；0 是空弦，1–4 是左手手指。简谱 0 是休止，1–7 是音级；音名 D3 中的 3 表示八度（中央 C 为 C4）。</p></div></section>
@@ -426,7 +426,7 @@ body.metronome-mode {
     </form>
   </dialog>
 </section>
-<p class="muted" data-audio-status role="status">音色：真实大提琴录音，首次播放时加载。</p><p class="muted"><a href="samples/cello/manifest.json" target="_blank" rel="noopener">录音来源：Karoryfer × bigcat · Kamila Borowiak</a> · <a href="samples/cello/LICENSE.txt" target="_blank" rel="noopener">CC0</a></p></main></div><div id="printRoot"></div><script>(function(root){
+<p class="muted"><a href="samples/cello/manifest.json" target="_blank" rel="noopener">录音来源：Karoryfer × bigcat · Kamila Borowiak</a> · <a href="samples/cello/LICENSE.txt" target="_blank" rel="noopener">CC0</a></p></main></div><div id="printRoot"></div><script>(function(root){
 'use strict';
 // Transcribed from the three score images supplied by the user.
 // Each token is sounding pitch:quarter-note beats:tie (s=start, c=continue, e=end).
@@ -1240,7 +1240,7 @@ const contexts=new WeakMap();
 const instruments=new WeakMap();let packRequest=null;
 function notify(state){
  if(typeof document==='undefined')return;
- const labels={loading:'正在准备真实大提琴录音…首次需加载约 10 MB，请稍候。',sampled:'音色：真实大提琴录音 · Karoryfer × bigcat',fallback:'音色：合成参考音（录音未能加载，下次播放将重试）'};
+ const labels={loading:'正在准备真实大提琴录音…首次需加载约 10 MB，请稍候。',sampled:'音色：真实大提琴录音 · Karoryfer × bigcat',fallback:'音色：合成参考音（录音尚未就绪，下次播放将重试）'};
  document.querySelectorAll('[data-audio-status]').forEach(el=>{el.textContent=labels[state];});
 }
 function loadPack(){
@@ -1257,19 +1257,30 @@ function loadPack(){
 }
 async function prepare(ctx){
  let state=instruments.get(ctx);
- if(state?.ready){notify('sampled');return true;}if(state?.pending)return state.pending;
- state={ready:false,voices:new Set(),roundRobin:new Map()};instruments.set(ctx,state);notify('loading');
- state.pending=(async()=>{try{
-  const pack=await loadPack();
-  const decoded=await Promise.all(pack.samples.map(async sample=>{
-   const bytes=Uint8Array.from(atob(sample.data),c=>c.charCodeAt(0));
-   const buffer=await ctx.decodeAudioData(bytes.buffer);
-   if(!(sample.loopStart>=0&&sample.loopEnd>sample.loopStart&&sample.loopEnd<=buffer.duration+.001))throw Error('录音循环点无效');
-   return {...sample,data:undefined,buffer};
-  }));
-  state.samples=decoded;state.ready=true;notify('sampled');return true;
- }catch(e){state.ready=false;notify('fallback');return false;}finally{state.pending=null;}})();
- return state.pending;
+ if(!state){state={ready:false,voices:new Set(),roundRobin:new Map()};instruments.set(ctx,state);}
+ if(state.ready||state.samples){state.ready=true;notify('sampled');return true;}
+ if(!state.pending){
+  state.pending=(async()=>{try{
+   const pack=await loadPack();
+   const decoded=[];
+   // Decode in sequence to bound peak memory on phones.
+   for(const sample of pack.samples){
+    const bytes=Uint8Array.from(atob(sample.data),c=>c.charCodeAt(0));
+    const buffer=await ctx.decodeAudioData(bytes.buffer);
+    if(!(sample.loopStart>=0&&sample.loopEnd>sample.loopStart&&sample.loopEnd<=buffer.duration+.001))throw Error('录音循环点无效');
+    decoded.push({...sample,data:undefined,buffer});
+   }
+   state.samples=decoded;return true;
+  }catch(e){return false;}finally{state.pending=null;}})();
+ }
+ notify('loading');
+ let timer;
+ try{
+  // A slow or stalled download/decoder must not indefinitely block practice.
+  // Keep the background request for the next tap, without changing timbre mid-phrase.
+  const ready=await Promise.race([state.pending,new Promise(resolve=>{timer=setTimeout(()=>resolve(false),8000);})]);
+  state.ready=ready;notify(ready?'sampled':'fallback');return ready;
+ }finally{clearTimeout(timer);}
 }
 function sampled(ctx,state,hz,start,duration){
  const midi=69+12*Math.log2(hz/440);
@@ -1381,16 +1392,23 @@ function loadLesson(next){if(initialized)drafts.set(current.id,{note:$('#recordN
  document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.hash==='#'+current.id));document.querySelectorAll('[data-library-group]').forEach(g=>g.open=g.dataset.libraryGroup===groupForLesson(current));$('#playerStatus').textContent='先读谱、拍节奏，再播放核对；读谱页按空格可播放或暂停。';renderScore();renderRecords();$('#printRoot').innerHTML=printHtml();}
 let ctx=null,activeNodes=new Set(),run=null,paused=null,frame=null,generation=0,audioNeedsReset=false,lastAudioReadyAt=0;const AUDIO_STALE_MS=15*60*1000;
 async function resetAudio(){const previous=ctx;ctx=null;audioNeedsReset=false;lastAudioReadyAt=0;if(!previous||previous.state==='closed')return;let timeout;try{await Promise.race([previous.close(),new Promise(resolve=>{timeout=setTimeout(resolve,350);})]);}catch{}finally{clearTimeout(timeout);}}
+async function ensureAudioRunning(audio){
+ if(audio.state!=='running'){let timeout;try{await Promise.race([audio.resume(),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('音频尚未启动，请再次点击播放。')),5000);})]);}finally{clearTimeout(timeout);}}
+ if(audio.state!=='running')throw Error('音频被系统暂停，请再次点击播放。');
+}
 async function audioReady({samples=true}={}){
  // Request the media playback channel before creating/resuming audio in the click handler.
  // Unsupported browsers keep their normal Web Audio behavior.
  try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch{}
  if(audioNeedsReset||(ctx&&lastAudioReadyAt&&Date.now()-lastAudioReadyAt>AUDIO_STALE_MS))await resetAudio();
  if(!ctx||ctx.state==='closed'){const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('当前浏览器不支持音频，请使用 Safari 打开。');ctx=new Audio();}
- if(ctx.state!=='running'){let timeout;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(Error('音频尚未启动，请用 Safari 打开后再次点击播放。')),5000);})]);}finally{clearTimeout(timeout);}}
- if(ctx.state!=='running')throw Error('音频被系统暂停，请再次点击播放。');
+ await ensureAudioRunning(ctx);
  const active=ctx;active.onstatechange=()=>{if(ctx===active&&active.state!=='running'&&active.state!=='closed')audioNeedsReset=true;};audioNeedsReset=false;lastAudioReadyAt=Date.now();
- if(samples)await CelloAudio.prepare(active);
+ if(samples){
+  await CelloAudio.prepare(active);
+  if(ctx!==active||document.hidden)throw Error('音频准备已中断，请再次点击播放。');
+  await ensureAudioRunning(active);
+ }
 }
 function tone(hz,start,duration,click=false){if(!click){const voice=CelloAudio.play(ctx,hz,start,duration);activeNodes.add(voice);voice.onended=()=>activeNodes.delete(voice);return voice;}const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=click?'sine':'triangle';osc.frequency.value=hz;const end=start+duration;gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(click?.10:.13,start+.007);gain.gain.setValueAtTime(click?.08:.11,Math.max(start+.008,end-.025));gain.gain.linearRampToValueAtTime(0,end);osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(end+.01);activeNodes.add(osc);osc.onended=()=>{activeNodes.delete(osc);osc.disconnect();gain.disconnect();};return osc;}
 function clearActive(keepLine=false){document.querySelectorAll('.note-event.active').forEach(e=>e.classList.remove('active'));if(!keepLine)document.querySelectorAll('.score-line.playing').forEach(e=>e.classList.remove('playing'));}
@@ -1399,7 +1417,7 @@ function stop(message=true){generation++;if(frame)cancelAnimationFrame(frame);fr
 function pause(){if(!run)return;const r=run,offset=Math.max(0,Math.min(r.plan.duration,ctx.currentTime-r.start));generation++;if(frame)cancelAnimationFrame(frame);frame=null;run=null;for(const n of activeNodes)try{n.stop();}catch(e){}activeNodes.clear();paused={...r,offset};$('#play').textContent='▶ 继续播放';$('#playerStatus').textContent='已暂停；按空格或“继续播放”继续。';}
 async function resume(){if(!paused)return play();const saved=paused,token=generation;try{await audioReady();if(token!==generation)return;}catch(e){$('#playerStatus').textContent=e.message||'请点击重试音频。';return;}const nextAfter=(items,offset)=>{const index=items.findIndex(e=>e.time>offset);return index<0?items.length:index;},offset=saved.offset;paused=null;run={...saved,start:ctx.currentTime-offset,nextNote:nextAfter(saved.plan.entries,offset),nextClick:nextAfter(saved.plan.clicks,offset),last:saved.plan.entries.findLastIndex(e=>e.time<=offset)};const sounding=saved.melody&&saved.plan.entries.findLast(e=>e.pitch&&!e.continuation&&e.time<=offset&&offset<e.time+(e.sustain||e.duration));if(sounding){const held=(sounding.sustain||sounding.duration)*(sounding.articulation==='staccato'?.55:.94),remaining=held-(offset-sounding.time);if(remaining>.03)tone(C.pitchInfo(sounding.pitch).hz,ctx.currentTime+.03,remaining);}$('#play').textContent='暂停';$('#playerStatus').textContent='继续播放…';pump();}
 async function singleNote(pitch){stop(false);if(!pitch){$('#playerStatus').textContent='休止符：保持安静，但继续数拍。';return;}const token=generation;try{await audioReady();if(token!==generation)return;const p=C.pitchInfo(pitch);tone(p.hz,ctx.currentTime+.03,.7);$('#playerStatus').textContent='单音试听：'+p.name;}catch(e){$('#playerStatus').textContent='音频未能启动，请再点击一次。';}}
-async function play(){if(paused){resume();return;}if(!validSelection())return;stop(false);const token=generation;let plan;try{plan=C.timeline(current,{...selection(),tempo:Number($('#tempo').value),countIn:$('#countIn').checked,repeat:$('#repeat').checked});await audioReady();if(token!==generation)return;}catch(e){$('#playerStatus').textContent=e.message||'请点击重试音频。';return;}
+async function play(){if(paused){resume();return;}if(!validSelection())return;stop(false);const token=generation;$('#playerStatus').textContent='正在准备声音…';let plan;try{plan=C.timeline(current,{...selection(),tempo:Number($('#tempo').value),countIn:$('#countIn').checked,repeat:$('#repeat').checked});await audioReady();if(token!==generation)return;}catch(e){$('#playerStatus').textContent=e.message||'请点击重试音频。';return;}
  run={plan,start:ctx.currentTime+.08,nextNote:0,nextClick:0,last:-1,activeLine:null,loop:$('#loop').checked,click:$('#metronome').checked,melody:$('#playbackMode').value==='music',cycle:0};$('#play').textContent='暂停';$('#playerStatus').textContent=run.melody?'准备播放…':'仅节拍：跟随谱面拉奏…';pump();}
 function pump(){if(!run)return;const r=run,now=ctx.currentTime,horizon=now+.18;
  while(r.nextNote<r.plan.entries.length&&r.start+r.plan.entries[r.nextNote].time<horizon){const e=r.plan.entries[r.nextNote++];if(r.melody&&e.pitch&&!e.continuation)tone(C.pitchInfo(e.pitch).hz,Math.max(now,r.start+e.time),Math.max(.03,(e.sustain||e.duration)*(e.articulation==='staccato'?.55:.94)));}
